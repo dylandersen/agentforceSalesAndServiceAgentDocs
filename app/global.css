@@ -1,3 +1,199 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
+
+/* Custom Agentforce Theme - Modern & Colorful */
+:root {
+  /* Primary brand colors - Salesforce inspired */
+  --color-fd-primary: 220 85% 57%;
+  --color-fd-primary-foreground: 0 0% 100%;
+  
+  /* Accent colors for highlights */
+  --color-fd-accent: 280 85% 60%;
+  --color-fd-accent-foreground: 0 0% 100%;
+  
+  /* Background with subtle gradient base */
+  --color-fd-background: 0 0% 100%;
+  --color-fd-foreground: 222 47% 11%;
+  
+  /* Cards with elevated feel */
+  --color-fd-card: 0 0% 98%;
+  --color-fd-card-foreground: 222 47% 11%;
+  
+  /* Muted elements */
+  --color-fd-muted: 210 40% 96%;
+  --color-fd-muted-foreground: 215 16% 47%;
+  
+  /* Secondary colors */
+  --color-fd-secondary: 216 90% 97%;
+  --color-fd-secondary-foreground: 222 47% 11%;
+  
+  /* Border */
+  --color-fd-border: 214 32% 91%;
+  
+  /* Add some modern shadows */
+  --fd-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --fd-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --fd-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.dark {
+  /* Dark mode with rich, vibrant colors */
+  --color-fd-primary: 220 90% 60%;
+  --color-fd-primary-foreground: 0 0% 100%;
+  
+  --color-fd-accent: 280 90% 65%;
+  --color-fd-accent-foreground: 0 0% 100%;
+  
+  --color-fd-background: 222 47% 8%;
+  --color-fd-foreground: 213 31% 91%;
+  
+  --color-fd-card: 222 47% 11%;
+  --color-fd-card-foreground: 213 31% 91%;
+  
+  --color-fd-muted: 223 47% 15%;
+  --color-fd-muted-foreground: 215 20% 65%;
+  
+  --color-fd-secondary: 222 47% 15%;
+  --color-fd-secondary-foreground: 213 31% 91%;
+  
+  --color-fd-border: 216 34% 17%;
+}
+
+/* Modern gradient header */
+body {
+  background: linear-gradient(180deg, 
+    hsl(var(--color-fd-background)) 0%, 
+    hsl(var(--color-fd-muted)) 100%
+  );
+  background-attachment: fixed;
+}
+
+/* Animated gradient for hero sections */
+.gradient-hero {
+  background: linear-gradient(135deg, 
+    hsl(var(--color-fd-primary)) 0%,
+    hsl(var(--color-fd-accent)) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Enhanced card styling */
+[data-card] {
+  border-radius: 12px;
+  border: 1px solid hsl(var(--color-fd-border));
+  background: hsl(var(--color-fd-card));
+  box-shadow: var(--fd-shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-card]:hover {
+  box-shadow: var(--fd-shadow-lg);
+  border-color: hsl(var(--color-fd-primary) / 0.3);
+  transform: translateY(-2px);
+}
+
+/* Colorful code blocks */
+pre {
+  border-radius: 8px !important;
+  border: 1px solid hsl(var(--color-fd-border)) !important;
+  box-shadow: var(--fd-shadow) !important;
+}
+
+/* Modern sidebar styling */
+#nd-sidebar {
+  border-right: 1px solid hsl(var(--color-fd-border));
+  background: hsl(var(--color-fd-card) / 0.5);
+  backdrop-filter: blur(12px);
+}
+
+/* Highlight active navigation items */
+[data-active="true"] {
+  background: linear-gradient(90deg,
+    hsl(var(--color-fd-primary) / 0.1),
+    transparent
+  );
+  border-left: 3px solid hsl(var(--color-fd-primary));
+  font-weight: 600;
+  color: hsl(var(--color-fd-primary));
+}
+
+/* Modern table of contents */
+[data-toc] {
+  border-left: 2px solid hsl(var(--color-fd-border));
+  transition: border-color 0.3s ease;
+}
+
+[data-toc]:hover {
+  border-left-color: hsl(var(--color-fd-primary));
+}
+
+/* Add pulse animation to primary buttons */
+.pulse-primary {
+  animation: pulse-primary 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-primary {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsl(var(--color-fd-primary) / 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px hsl(var(--color-fd-primary) / 0);
+  }
+}
+
+/* Glassmorphism effect for cards */
+.glass-card {
+  background: hsl(var(--color-fd-card) / 0.7);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid hsl(var(--color-fd-border) / 0.5);
+  box-shadow: var(--fd-shadow-lg);
+}
+
+/* Modern callout styling */
+[data-callout] {
+  border-radius: 8px;
+  border-left-width: 4px;
+  box-shadow: var(--fd-shadow-sm);
+}
+
+[data-callout="info"] {
+  border-left-color: hsl(var(--color-fd-primary));
+  background: hsl(var(--color-fd-primary) / 0.05);
+}
+
+[data-callout="warn"] {
+  border-left-color: hsl(45 93% 47%);
+  background: hsl(45 93% 47% / 0.05);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--color-fd-muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--color-fd-primary) / 0.5);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--color-fd-primary));
+}
