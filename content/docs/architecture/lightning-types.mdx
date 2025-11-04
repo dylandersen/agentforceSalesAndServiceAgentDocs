@@ -1,0 +1,484 @@
+---
+title: Lightning Types
+description: 'Custom UI components for rich data input and output'
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { FileCode, PenTool, Monitor, Code, RotateCw, Lock, ClipboardCheck, Palette, AlertCircle, RefreshCw, AlertTriangle, GitBranch } from 'lucide-react';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## What are Lightning Types?
+
+Lightning Types are JSON-based data structures that define how data is structured, validated, and presented within Agentforce actions. They enable custom input and output components for collecting and displaying information during agent interactions.
+
+<Callout type="info">
+Lightning Types bridge the gap between Apex data structures and custom Lightning Web Components, providing type-safe, beautiful UI experiences.
+</Callout>
+
+## Core Components
+
+Every Lightning Type consists of three parts:
+
+<Cards>
+  <Card title="Schema" icon={<FileCode />}>
+    Defines data structure and validation rules
+  </Card>
+  <Card title="Editor" icon={<PenTool />}>
+    Custom LWC for data input
+  </Card>
+  <Card title="Renderer" icon={<Monitor />}>
+    Custom LWC for data display
+  </Card>
+</Cards>
+
+### 1. Schema (schema.json)
+
+Defines the data structure and links to an Apex class:
+
+```json
+{
+  "title": "Account Input",
+  "description": "Input fields for account creation",
+  "lightning:type": "@apexClassType/c__AccountCreationInput"
+}
+```
+
+<Callout type="info">
+The `lightning:type` property references an Apex class with `@JsonAccess(serializable='always' deserializable='always')` annotation.
+</Callout>
+
+**Required Apex Class Pattern**:
+
+```apex
+@JsonAccess(serializable='always' deserializable='always')
+global class AccountCreationInput {
+    @AuraEnabled
+    global String name;
+
+    @AuraEnabled
+    global String phone;
+
+    @AuraEnabled
+    global String website;
+    
+    // ... more properties
+}
+```
+
+### 2. Editor (editor.json)
+
+Specifies the custom LWC used for data input:
+
+```json
+{
+  "editor": {
+    "componentOverrides": {
+      "$": {
+        "definition": "c/accountInputEditor"
+      }
+    }
+  }
+}
+```
+
+**Directory Structure**:
+```
+lightningTypes/
+└── accountInput/
+    ├── schema.json
+    └── lightningDesktopGenAi/
+        └── editor.json
+```
+
+### 3. Renderer (renderer.json)
+
+Specifies the custom LWC used for displaying results:
+
+```json
+{
+  "renderer": {
+    "componentOverrides": {
+      "$": {
+        "definition": "c/accountResultRenderer"
+      }
+    }
+  }
+}
+```
+
+## Lightning Web Component Patterns
+
+### Editor Component Pattern
+
+The editor LWC must implement specific properties and methods:
+
+```javascript
+import { LightningElement, api } from 'lwc';
+
+export default class AccountInputEditor extends LightningElement {
+    // Read-only mode support
+    @api
+    get readOnly() {
+        return this._readOnly;
+    }
+    set readOnly(value) {
+        this._readOnly = value;
+    }
+    _readOnly = false;
+    
+    // Value property for data binding
+    @api
+    get value() {
+        return this._value;
+    }
+    set value(value) {
+        this._value = value;
+    }
+    _value = {};
+    
+    // Initialize from existing value
+    connectedCallback() {
+        if (this.value) {
+            this.name = this.value.name || '';
+            this.phone = this.value.phone || '';
+            // ... initialize other fields
+        }
+    }
+    
+    // Handle input changes
+    handleInputChange(event) {
+        const field = event.target.dataset.field;
+        this[field] = event.target.value;
+        
+        // Dispatch valuechange event
+        this.dispatchEvent(new CustomEvent('valuechange', {
+            detail: {
+                value: {
+                    name: this.name,
+                    phone: this.phone,
+                    // ... all field values
+                }
+            }
+        }));
+    }
+}
+```
+
+<Callout type="warn">
+Always dispatch a `valuechange` event when the value changes. This notifies Agentforce of the updated data.
+</Callout>
+
+### Renderer Component Pattern
+
+The renderer LWC displays formatted data:
+
+```javascript
+import { LightningElement, api } from 'lwc';
+
+export default class AccountResultRenderer extends LightningElement {
+    @api value;
+    
+    // Computed properties for display
+    get formattedPhone() {
+        return this.formatPhoneNumber(this.value?.phone);
+    }
+    
+    get accountUrl() {
+        return `/lightning/r/Account/${this.value?.accountId}/view`;
+    }
+    
+    // Process data in lifecycle hook
+    connectedCallback() {
+        console.log('Rendering account result:', this.value);
+    }
+    
+    // Helper methods
+    formatPhoneNumber(phone) {
+        // Format logic here
+        return phone;
+    }
+}
+```
+
+## Complete Example: Account Creation
+
+### File Structure
+
+```
+force-app/main/default/
+├── classes/
+│   ├── AccountCreationInput.cls
+│   ├── AccountCreationResult.cls
+│   └── AccountCreationAgent.cls
+├── lightningTypes/
+│   ├── accountInput/
+│   │   ├── schema.json
+│   │   └── lightningDesktopGenAi/
+│   │       └── editor.json
+│   └── accountResult/
+│       ├── schema.json
+│       └── lightningDesktopGenAi/
+│           └── renderer.json
+└── lwc/
+    ├── accountInputEditor/
+    │   ├── accountInputEditor.js
+    │   ├── accountInputEditor.html
+    │   └── accountInputEditor.css
+    └── accountResultRenderer/
+        ├── accountResultRenderer.js
+        ├── accountResultRenderer.html
+        └── accountResultRenderer.css
+```
+
+### Apex Data Classes
+
+```apex
+// AccountCreationInput.cls
+@JsonAccess(serializable='always' deserializable='always')
+global class AccountCreationInput {
+    @AuraEnabled
+    global String name;
+
+    @AuraEnabled
+    global String phone;
+
+    @AuraEnabled
+    global String website;
+
+    @AuraEnabled
+    global String industry;
+}
+
+// AccountCreationResult.cls
+@JsonAccess(serializable='always' deserializable='always')
+global class AccountCreationResult {
+    @AuraEnabled
+    global String accountId;
+
+    @AuraEnabled
+    global String accountName;
+
+    @AuraEnabled
+    global Boolean success;
+
+    @AuraEnabled
+    global String message;
+}
+```
+
+### Lightning Type Schemas
+
+```json
+// accountInput/schema.json
+{
+  "title": "Account Input",
+  "description": "Fields for creating an account",
+  "lightning:type": "@apexClassType/c__AccountCreationInput"
+}
+
+// accountResult/schema.json
+{
+  "title": "Account Result",
+  "description": "Result of account creation",
+  "lightning:type": "@apexClassType/c__AccountCreationResult"
+}
+```
+
+### Editor/Renderer Configuration
+
+```json
+// accountInput/lightningDesktopGenAi/editor.json
+{
+  "editor": {
+    "componentOverrides": {
+      "$": {
+        "definition": "c/accountInputEditor"
+      }
+    }
+  }
+}
+
+// accountResult/lightningDesktopGenAi/renderer.json
+{
+  "renderer": {
+    "componentOverrides": {
+      "$": {
+        "definition": "c/accountResultRenderer"
+      }
+    }
+  }
+}
+```
+
+## Advanced Features
+
+### Dynamic Picklists
+
+Load picklist values dynamically from org configuration:
+
+```javascript
+// In editor component
+@wire(getPicklistValues, {
+    recordTypeId: '012000000000000AAA',
+    fieldApiName: INDUSTRY_FIELD
+})
+wiredIndustryValues({ data, error }) {
+    if (data) {
+        this.industryOptions = data.values.map(item => ({
+            label: item.label,
+            value: item.value
+        }));
+    }
+}
+```
+
+### Conditional Fields
+
+Show/hide fields based on other inputs:
+
+```javascript
+get showBillingAddress() {
+    return this.accountType === 'Customer';
+}
+```
+
+```html
+<template if:true={showBillingAddress}>
+    <lightning-input 
+        label="Billing Street"
+        value={billingStreet}
+        onchange={handleInputChange}>
+    </lightning-input>
+</template>
+```
+
+### Field Validation
+
+Implement custom validation logic:
+
+```javascript
+@api
+validate() {
+    const allValid = [
+        ...this.template.querySelectorAll('lightning-input')
+    ].reduce((validSoFar, input) => {
+        input.reportValidity();
+        return validSoFar && input.checkValidity();
+    }, true);
+
+    if (!allValid) {
+        return {
+            isValid: false,
+            errorMessage: 'Please complete all required fields.'
+        };
+    }
+
+    return { isValid: true };
+}
+```
+
+## Best Practices
+
+<Cards>
+  <Card title="Keep Apex Classes Simple" icon={<Code />}>
+    Use Apex classes only for data structure, not business logic - plain data containers with `@AuraEnabled` properties and no methods
+  </Card>
+  
+  <Card title="Reuse LWC Components" icon={<RotateCw />}>
+    Share common patterns across Lightning Types through base components and composition
+  </Card>
+  
+  <Card title="Handle Read-Only State" icon={<Lock />}>
+    Always respect the `readOnly` property by disabling inputs and hiding actions
+  </Card>
+  
+  <Card title="Validate Input" icon={<ClipboardCheck />}>
+    Perform client-side validation with clear error messages
+  </Card>
+  
+  <Card title="Use SLDS Styling" icon={<Palette />}>
+    Follow Salesforce Lightning Design System for consistent appearance
+  </Card>
+</Cards>
+
+## Deployment Considerations
+
+<Callout type="warn">
+**Critical Deployment Order**: Lightning Type bundles reference LWCs. Deploy them together!
+</Callout>
+
+### Correct Deployment Order
+
+<Steps>
+  <Step>
+    **Deploy Apex Classes**: Deploy data structure classes first
+    ```bash
+    sf project deploy start --source-dir force-app/main/default/classes
+    ```
+  </Step>
+
+  <Step>
+    **Deploy LWCs and Lightning Types Together**: Deploy in a single operation
+    ```bash
+    sf project deploy start --source-dir force-app/main/default/lwc,force-app/main/default/lightningTypes
+    ```
+  </Step>
+
+  <Step>
+    **Verify References**: Check that all LWC references resolve correctly
+  </Step>
+</Steps>
+
+<Callout type="info">
+If you deploy Lightning Type bundles before the LWCs they reference, Salesforce will throw an error: "Something's not right with the definition name c/componentName."
+</Callout>
+
+## Troubleshooting
+
+<Cards>
+  <Card title="LWC Reference Error" icon={<AlertCircle />}>
+    **Error**: "Something's not right with the definition name c/componentName"
+    
+    **Solution**: Deploy LWCs and Lightning Types together in the same deployment.
+  </Card>
+  
+  <Card title="Value Not Updating" icon={<RefreshCw />}>
+    **Problem**: Changes in editor don't reflect in Agentforce
+    
+    **Solution**: Ensure you're dispatching `valuechange` event correctly
+  </Card>
+  
+  <Card title="Schema Validation Errors" icon={<AlertTriangle />}>
+    **Problem**: "Schema validation failed"
+    
+    **Solution**: Check Apex class has `@JsonAccess` annotation and all properties have `@AuraEnabled`
+  </Card>
+  
+  <Card title="Styling Issues" icon={<Palette />}>
+    **Problem**: Component doesn't match SLDS design
+    
+    **Solution**: Use SLDS utility classes and test in both light and dark modes
+  </Card>
+</Cards>
+
+## Next Steps
+
+<Cards>
+  <Card
+    title="Apex Classes"
+    icon={<Code />}
+    href="/docs/architecture/apex-classes"
+  >
+    Learn about business logic implementation
+  </Card>
+  
+  <Card
+    title="Flows"
+    icon={<GitBranch />}
+    href="/docs/architecture/flows"
+  >
+    Understand flow orchestration
+  </Card>
+</Cards>
+

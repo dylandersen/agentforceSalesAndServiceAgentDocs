@@ -1,0 +1,11 @@
+{
+  "title": "Architecture",
+  "pages": [
+    "index",
+    "lightning-types",
+    "apex-classes",
+    "flows",
+    "genai-functions"
+  ]
+}
+

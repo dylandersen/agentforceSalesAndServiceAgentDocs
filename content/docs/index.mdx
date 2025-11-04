@@ -6,6 +6,7 @@ description: AI-powered Salesforce automation with Lightning Types
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Plus, Brain, Settings, Palette, Network, Rocket, Sparkles, Code, MessageCircle, Users, BookOpen } from 'lucide-react';
 
 <div className="gradient-hero p-8 rounded-xl mb-8 text-white">
   <h1 className="text-4xl font-bold mb-4">Agentforce Sales & Service Agent</h1>
@@ -23,19 +24,19 @@ A comprehensive Salesforce Agentforce implementation that brings **conversationa
 ## Key Capabilities
 
 <Cards>
-  <Card title="AI Record Creation" icon="Plus" href="#record-creation">
+  <Card title="AI Record Creation" icon={<Plus />} href="#record-creation">
     Create Accounts, Opportunities, Cases, and Contacts through natural conversation with beautiful custom Lightning Type UI components
   </Card>
   
-  <Card title="Intelligence & Analysis" icon="Brain" href="#intelligence">
+  <Card title="Intelligence & Analysis" icon={<Brain />} href="#intelligence">
     6-dimension health scoring, sales guidance, priority analysis, and semantic similarity matching powered by Einstein AI
   </Card>
   
-  <Card title="Smart Field Management" icon="Settings" href="#field-management">
+  <Card title="Smart Field Management" icon={<Settings />} href="#field-management">
     Update and manage record fields with confidence using confirmation-based updates and full undo capability
   </Card>
   
-  <Card title="Custom Lightning Types" icon="Palette" href="#lightning-types">
+  <Card title="Custom Lightning Types" icon={<Palette />} href="#lightning-types">
     Rich, type-safe UI components with JSON schema validation and reusable design patterns
   </Card>
 </Cards>
@@ -91,19 +92,19 @@ Built on four powerful layers working seamlessly together:
 ## Explore the Documentation
 
 <Cards>
-  <Card title="Architecture" icon="Network" href="/docs/architecture">
+  <Card title="Architecture" icon={<Network />} href="/docs/architecture">
     Deep dive into the hybrid architecture combining Apex, Flows, GenAI Functions, and Lightning Types
   </Card>
   
-  <Card title="Deployment" icon="Rocket" href="/docs/deployment">
+  <Card title="Deployment" icon={<Rocket />} href="/docs/deployment">
     Complete deployment guide with prerequisites, installation steps, and troubleshooting
   </Card>
   
-  <Card title="Features" icon="Sparkles" href="/docs/features">
+  <Card title="Features" icon={<Sparkles />} href="/docs/features">
     Explore all AI-powered capabilities including health scoring, similarity matching, and more
   </Card>
   
-  <Card title="API Reference" icon="Code" href="/docs/api">
+  <Card title="API Reference" icon={<Code />} href="/docs/api">
     Technical documentation, Apex classes, and Lightning Type schemas
   </Card>
 </Cards>
@@ -128,15 +129,15 @@ Built on four powerful layers working seamlessly together:
 ## Community & Support
 
 <Cards>
-  <Card title="GitHub Discussions" icon="MessageCircle" href="https://github.com/dylandersen/agentforce-docs">
+  <Card title="GitHub Discussions" icon={<MessageCircle />} href="https://github.com/dylandersen/agentforce-docs">
     Join the conversation, ask questions, and share your experiences
   </Card>
   
-  <Card title="Trailblazer Community" icon="Users" href="https://trailblazercommunity.salesforce.com">
+  <Card title="Trailblazer Community" icon={<Users />} href="https://trailblazercommunity.salesforce.com">
     Connect with thousands of Salesforce developers and admins
   </Card>
   
-  <Card title="Documentation" icon="BookOpen" href="/docs/architecture">
+  <Card title="Documentation" icon={<BookOpen />} href="/docs/architecture">
     Comprehensive guides, tutorials, and API references
   </Card>
 </Cards>

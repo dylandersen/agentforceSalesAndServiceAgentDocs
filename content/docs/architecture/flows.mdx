@@ -1,0 +1,393 @@
+---
+title: Flows & Orchestration
+description: 'Flow-based orchestration layer for Agentforce integration'
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Plug, Sliders, Shield, Bug, Building, TrendingUp, Ticket, User, Brain, Database, Layers, GitBranch, Clock, AlertCircle, Search, ArrowRightLeft, Gauge, Bot, Code } from 'lucide-react';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Steps, Step } from 'fumadocs-ui/components/steps';
+
+## Flow Orchestration Layer
+
+Flows serve as the **orchestration layer** between GenAI Functions and Apex business logic. They provide a declarative, configurable way to manage Agentforce interactions.
+
+<Callout type="info">
+All flows in this project are **auto-launched flows** designed to be invoked by GenAI Functions.
+</Callout>
+
+## Why Flows?
+
+<Cards>
+  <Card title="GenAI Integration" icon={<Plug />}>
+    Native support for Agentforce as invocation targets
+  </Card>
+  <Card title="Configuration" icon={<Sliders />}>
+    Non-developers can modify without code changes
+  </Card>
+  <Card title="Error Handling" icon={<Shield />}>
+    Built-in error handling and retry logic
+  </Card>
+  <Card title="Debugging" icon={<Bug />}>
+    Visual debugging and flow inspector tools
+  </Card>
+</Cards>
+
+## Flow Categories
+
+### Record Creation Flows
+
+<Cards>
+  <Card title="Create_Account_with_Agent" icon={<Building />}>
+    **Purpose**: Account creation with Lightning Type inputs
+    
+    **Flow Elements**:
+    1. Input variable: `accountInput` (Lightning Type)
+    2. Apex Action: Call `AccountCreationAgent.createAccount()`
+    3. Output variable: `accountResult` (Lightning Type)
+    4. Error handling screen
+    
+    **Configuration**:
+    - Input: `lightning__accountInput`
+    - Output: `lightning__accountResult`
+    - Invoked by: `Create_Account_with_Agent` GenAI Function
+  </Card>
+  
+  <Card title="Create_Opportunity_with_Agent" icon={<TrendingUp />}>
+    **Purpose**: Opportunity creation with account lookup
+    
+    **Flow Elements**:
+    1. Input variable: `opportunityInput` (Lightning Type)
+    2. Decision: Validate account exists
+    3. Apex Action: Call `OpportunityCreationAgent.createOpportunity()`
+    4. Output variable: `opportunityResult` (Lightning Type)
+    5. Error handling for missing account
+    
+    **Special Features**:
+    - Account name to ID lookup
+    - Dynamic stage validation
+    - Currency formatting
+  </Card>
+  
+  <Card title="Create_Case_with_Agent" icon={<Ticket />}>
+    **Purpose**: Case creation with contact lookup
+    
+    **Flow Elements**:
+    1. Input variable: `caseInput` (Lightning Type)
+    2. Decision: Validate contact exists
+    3. Get Records: Auto-populate account from contact
+    4. Apex Action: Call `CaseCreationAgent.createCase()`
+    5. Output variable: `caseResult` (Lightning Type)
+    
+    **Special Features**:
+    - Contact to account auto-population
+    - Priority/status picklist validation
+  </Card>
+  
+  <Card title="Create_Contact_with_Agent" icon={<User />}>
+    **Purpose**: Contact creation with account association
+    
+    **Flow Elements**:
+    1. Input variable: `contactInput` (Lightning Type)
+    2. Decision: Validate account exists
+    3. Apex Action: Call `ContactCreationAgent.createContact()`
+    4. Output variable: `contactResult` (Lightning Type)
+    5. Error handling for missing account
+    
+    **Special Features**:
+    - Required account association
+    - Phone formatting
+    - Extended field support
+  </Card>
+</Cards>
+
+### Analysis Flows
+
+<Cards>
+  <Card title="Analyze_Account_Flow" icon={<Brain />}>
+    **Purpose**: Comprehensive 6-dimension account health analysis
+    
+    **Flow Elements**:
+    1. Input: `accountId`
+    2. Apex Action: Call `AccountIntelligence.analyzeAccount()`
+    3. Output: `accountHealthResult` (Lightning Type)
+    4. AI-powered insights with Einstein GPT
+    
+    **Analysis Dimensions**:
+    - Overall Health Score (0-100)
+    - Renewal Risk Assessment
+    - Expansion Opportunity Score
+    - Sales Engagement Quality
+    - Case Health
+    - Revenue Intelligence
+  </Card>
+  
+  <Card title="Analyze_Opportunity_Flow" icon={<TrendingUp />}>
+    **Purpose**: Sales guidance with activity timeline
+    
+    **Flow Elements**:
+    1. Input: `opportunityId`
+    2. Apex Action: Call `OpportunityIntelligence.analyzeOpportunity()`
+    3. Output: Rich text analysis
+    4. AI-powered recommendations
+    
+    **Features**:
+    - Activity timeline review
+    - Deal momentum assessment
+    - Risk identification
+    - 3 actionable next steps
+  </Card>
+</Cards>
+
+## Data Flow Pattern
+
+<Steps>
+  <Step>
+    **User Input**: User initiates conversation with Agentforce
+  </Step>
+  
+  <Step>
+    **GenAI Function**: Function validates input schema and invokes Flow
+  </Step>
+  
+  <Step>
+    **Lightning Type Editor**: Custom LWC displays input form with dynamic picklists
+  </Step>
+  
+  <Step>
+    **Flow Orchestration**: Flow receives data and calls Apex business logic
+  </Step>
+  
+  <Step>
+    **Apex Processing**: Apex performs SOQL queries, AI integration, and data processing
+  </Step>
+  
+  <Step>
+    **Lightning Type Renderer**: Custom LWC displays formatted results
+  </Step>
+  
+  <Step>
+    **User Response**: Agentforce presents final output to user
+  </Step>
+</Steps>
+
+## Flow Design Patterns
+
+### Input/Output Variables
+
+All flows follow this variable pattern:
+
+```
+Input Variables:
+- API Name: Use camelCase (e.g., accountInput)
+- Data Type: Match Lightning Type or standard type
+- Required: Mark required fields
+- Description: Clear description of purpose
+
+Output Variables:
+- API Name: Use descriptive names (e.g., accountResult)
+- Data Type: Lightning Type or Text/Rich Text
+- Available for Output: Checked
+- Description: What the output contains
+```
+
+### Error Handling Pattern
+
+Standard error handling structure:
+
+```
+Decision Element: Check for Errors
+├─ When: Apex returns error
+│  └─ Assignment: Set error message
+│  └─ Screen (optional): Display error to user
+│  └─ Output: Error result
+└─ Otherwise: Continue with success path
+```
+
+### Apex Action Configuration
+
+How flows call Apex classes:
+
+```
+Apex Action Element:
+- Action: [ApexClassName].[methodName]
+- Set Input Values:
+  - inputParameter = {!flowInputVariable}
+- Store Output Values:
+  - outputVariable = {!apexReturnValue}
+- When to Execute: All Conditions Are Met (AND)
+- Advanced: Manually assign variables
+```
+
+## Example: Account Creation Flow
+
+### Visual Flow Structure
+
+```
+START
+  ↓
+[Input: accountInput]
+  ↓
+[Decision: Validate Required Fields]
+  ├─ Missing Fields → [Screen: Error Message] → END
+  └─ All Present → Continue
+     ↓
+[Apex Action: AccountCreationAgent.createAccount()]
+  ├─ Input: accountInput
+  └─ Output: accountResult
+     ↓
+[Decision: Check Success]
+  ├─ Success = false → [Screen: Error Message] → END
+  └─ Success = true → Continue
+     ↓
+[Assignment: Format Output]
+  ↓
+[Output: accountResult]
+  ↓
+END
+```
+
+### Flow Metadata Structure
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>60.0</apiVersion>
+    <description>Creates an account using Lightning Type input</description>
+    <label>Create Account with Agent</label>
+    <processType>AutoLaunchedFlow</processType>
+    
+    <!-- Input Variable -->
+    <variables>
+        <name>accountInput</name>
+        <dataType>SObject</dataType>
+        <objectType>AccountCreationInput__c</objectType>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    
+    <!-- Output Variable -->
+    <variables>
+        <name>accountResult</name>
+        <dataType>SObject</dataType>
+        <objectType>AccountCreationResult__c</objectType>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    
+    <!-- Apex Action -->
+    <actionCalls>
+        <name>Create_Account</name>
+        <label>Create Account</label>
+        <actionName>AccountCreationAgent</actionName>
+        <actionType>apex</actionType>
+        <inputParameters>
+            <name>inputs</name>
+            <value>
+                <elementReference>accountInput</elementReference>
+            </value>
+        </inputParameters>
+        <outputParameters>
+            <name>result</name>
+            <assignToReference>accountResult</assignToReference>
+        </outputParameters>
+    </actionCalls>
+</Flow>
+```
+
+## Performance Optimization
+
+<Cards>
+  <Card title="Minimize Queries" icon={<Database />}>
+    - Use Get Records efficiently
+    - Batch queries where possible
+    - Avoid loops with SOQL
+    - Use collection variables
+  </Card>
+  
+  <Card title="Bulk Operations" icon={<Layers />}>
+    - Process collections, not individuals
+    - Use Fast Field Updates
+    - Batch DML operations
+    - Minimize transaction time
+  </Card>
+  
+  <Card title="Efficient Decisions" icon={<GitBranch />}>
+    - Order conditions by likelihood
+    - Use formula fields when possible
+    - Avoid complex logic in flows
+    - Delegate to Apex for complexity
+  </Card>
+  
+  <Card title="Async When Possible" icon={<Clock />}>
+    - Use scheduled paths
+    - Consider platform events
+    - Async Apex for long operations
+    - Batch processes for bulk
+  </Card>
+</Cards>
+
+## Troubleshooting Flows
+
+<Cards>
+  <Card title="Flow Won't Activate" icon={<AlertCircle />}>
+    **Common Issues**:
+    - Missing required fields
+    - Invalid Apex references
+    - Circular dependencies
+    - Version conflicts
+    
+    **Solution**: Check Flow error messages and validate all references
+  </Card>
+  
+  <Card title="GenAI Function Can't Find Flow" icon={<Search />}>
+    **Problem**: "Invocation target not found"
+    
+    **Solution**: 
+    - Ensure flow is activated
+    - Verify flow API name matches GenAI Function
+    - Check flow type is Auto-Launched
+    - Redeploy if needed
+  </Card>
+  
+  <Card title="Variables Not Passing" icon={<ArrowRightLeft />}>
+    **Problem**: Null or missing data between elements
+    
+    **Solution**:
+    - Verify variable types match
+    - Check "Available for Input/Output" settings
+    - Use Debug to track values
+    - Validate Apex return types
+  </Card>
+  
+  <Card title="Performance Issues" icon={<Gauge />}>
+    **Problem**: Flow times out or runs slowly
+    
+    **Solution**:
+    - Move complex logic to Apex
+    - Reduce SOQL queries
+    - Optimize loops
+    - Use bulkification
+  </Card>
+</Cards>
+
+## Next Steps
+
+<Cards>
+  <Card
+    title="GenAI Functions"
+    icon={<Bot />}
+    href="/docs/architecture/genai-functions"
+  >
+    Learn how GenAI Functions invoke flows
+  </Card>
+  
+  <Card
+    title="Apex Classes"
+    icon={<Code />}
+    href="/docs/architecture/apex-classes"
+  >
+    Understand the business logic layer
+  </Card>
+</Cards>
+

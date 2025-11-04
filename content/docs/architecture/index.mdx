@@ -5,6 +5,7 @@ description: 'Understanding the hybrid architecture of Agentforce Sales & Servic
 
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Code, GitBranch, Bot, Layout, Puzzle, Layers, RotateCw, Wrench, FlaskConical, ArrowUpDown, ArrowRightLeft, Package } from 'lucide-react';
 
 ## Hybrid Architecture Design
 
@@ -15,7 +16,7 @@ This project implements a **hybrid approach** combining Apex classes, Flows, Gen
 ## Four-Layer Architecture
 
 <Cards>
-  <Card title="Business Logic Layer" icon="Code">
+  <Card title="Business Logic Layer" icon={<Code />}>
     **Apex Classes**
     - Complex data processing
     - AI integration
@@ -23,7 +24,7 @@ This project implements a **hybrid approach** combining Apex classes, Flows, Gen
     - Reusable business logic
   </Card>
   
-  <Card title="Orchestration Layer" icon="GitBranch">
+  <Card title="Orchestration Layer" icon={<GitBranch />}>
     **Flows**
     - Agentforce integration
     - Configuration management
@@ -31,7 +32,7 @@ This project implements a **hybrid approach** combining Apex classes, Flows, Gen
     - Non-developer friendly
   </Card>
   
-  <Card title="Natural Language Layer" icon="Bot">
+  <Card title="Natural Language Layer" icon={<Bot />}>
     **GenAI Functions**
     - Conversational interfaces
     - Schema validation
@@ -39,7 +40,7 @@ This project implements a **hybrid approach** combining Apex classes, Flows, Gen
     - Seamless AI integration
   </Card>
   
-  <Card title="Presentation Layer" icon="Layout">
+  <Card title="Presentation Layer" icon={<Layout />}>
     **Lightning Types**
     - Custom UI components
     - Rich input forms
@@ -204,7 +205,7 @@ sequenceDiagram
 ## Key Architectural Principles
 
 <Cards>
-  <Card title="Separation of Concerns" icon="Layers">
+  <Card title="Separation of Concerns" icon={<Layers />}>
     Each layer has a specific responsibility:
     - Business logic in Apex
     - Orchestration in Flows
@@ -212,7 +213,7 @@ sequenceDiagram
     - Conversation in GenAI Functions
   </Card>
   
-  <Card title="Reusability" icon="RotateCw">
+  <Card title="Reusability" icon={<RotateCw />}>
     Components are designed for reuse:
     - Apex classes shared across flows
     - Lightning Types reusable patterns
@@ -220,7 +221,7 @@ sequenceDiagram
     - Flows configurable
   </Card>
   
-  <Card title="Maintainability" icon="Wrench">
+  <Card title="Maintainability" icon={<Wrench />}>
     Easy to maintain and extend:
     - Non-developers can configure flows
     - Developers modify Apex logic
@@ -228,7 +229,7 @@ sequenceDiagram
     - AI prompts easily tuned
   </Card>
   
-  <Card title="Testability" icon="FlaskConical">
+  <Card title="Testability" icon={<FlaskConical />}>
     Comprehensive testing strategy:
     - Unit tests for Apex classes
     - Flow tests for orchestration
@@ -283,7 +284,7 @@ sequenceDiagram
 <Cards>
   <Card
     title="Lightning Types Deep Dive"
-    icon="Puzzle"
+    icon={<Puzzle />}
     href="/docs/architecture/lightning-types"
   >
     Learn about custom Lightning Types
@@ -291,7 +292,7 @@ sequenceDiagram
   
   <Card
     title="Apex Classes"
-    icon="Code"
+    icon={<Code />}
     href="/docs/architecture/apex-classes"
   >
     Explore the business logic layer
@@ -299,7 +300,7 @@ sequenceDiagram
   
   <Card
     title="Flows & Orchestration"
-    icon="GitBranch"
+    icon={<GitBranch />}
     href="/docs/architecture/flows"
   >
     Understand the orchestration layer
@@ -307,7 +308,7 @@ sequenceDiagram
   
   <Card
     title="GenAI Functions"
-    icon="Bot"
+    icon={<Bot />}
     href="/docs/architecture/genai-functions"
   >
     Dive into AI integration
