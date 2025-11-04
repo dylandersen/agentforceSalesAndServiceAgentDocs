@@ -2,21 +2,24 @@
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 
-/* Custom Agentforce Theme - Modern & Colorful */
+/* Import modern, professional font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* Custom Agentforce Theme - Modern & Professional */
 :root {
-  /* Primary brand colors - Salesforce inspired */
-  --color-fd-primary: 220 85% 57%;
+  /* Unique blue palette - deeper, more sophisticated */
+  --color-fd-primary: 211 88% 48%;  /* Unique vibrant blue */
   --color-fd-primary-foreground: 0 0% 100%;
   
-  /* Accent colors for highlights */
-  --color-fd-accent: 280 85% 60%;
+  /* Accent using teal for differentiation */
+  --color-fd-accent: 195 85% 45%;
   --color-fd-accent-foreground: 0 0% 100%;
   
-  /* Background with subtle gradient base */
+  /* Background */
   --color-fd-background: 0 0% 100%;
   --color-fd-foreground: 222 47% 11%;
   
-  /* Cards with elevated feel */
+  /* Cards with subtle elevation */
   --color-fd-card: 0 0% 98%;
   --color-fd-card-foreground: 222 47% 11%;
   
@@ -31,18 +34,18 @@
   /* Border */
   --color-fd-border: 214 32% 91%;
   
-  /* Add some modern shadows */
+  /* Modern shadows */
   --fd-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --fd-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --fd-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 .dark {
-  /* Dark mode with rich, vibrant colors */
-  --color-fd-primary: 220 90% 60%;
+  /* Dark mode with rich blue */
+  --color-fd-primary: 211 90% 55%;
   --color-fd-primary-foreground: 0 0% 100%;
   
-  --color-fd-accent: 280 90% 65%;
+  --color-fd-accent: 195 88% 50%;
   --color-fd-accent-foreground: 0 0% 100%;
   
   --color-fd-background: 222 47% 8%;
@@ -60,16 +63,38 @@
   --color-fd-border: 216 34% 17%;
 }
 
-/* Modern gradient header */
+/* Apply Inter font globally */
 body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   background: linear-gradient(180deg, 
     hsl(var(--color-fd-background)) 0%, 
     hsl(var(--color-fd-muted)) 100%
   );
   background-attachment: fixed;
+  font-feature-settings: 'cv11', 'ss01';
+  font-optical-sizing: auto;
 }
 
-/* Animated gradient for hero sections */
+/* Strong headings with Inter */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+h1 {
+  font-weight: 800;
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-weight: 700;
+  font-size: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Animated gradient ONLY for hero sections */
 .gradient-hero {
   background: linear-gradient(135deg, 
     hsl(var(--color-fd-primary)) 0%,
@@ -110,8 +135,7 @@ pre {
 /* Modern sidebar styling */
 #nd-sidebar {
   border-right: 1px solid hsl(var(--color-fd-border));
-  background: hsl(var(--color-fd-card) / 0.5);
-  backdrop-filter: blur(12px);
+  background: hsl(var(--color-fd-card));
 }
 
 /* Highlight active navigation items */
@@ -135,21 +159,7 @@ pre {
   border-left-color: hsl(var(--color-fd-primary));
 }
 
-/* Add pulse animation to primary buttons */
-.pulse-primary {
-  animation: pulse-primary 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse-primary {
-  0%, 100% {
-    box-shadow: 0 0 0 0 hsl(var(--color-fd-primary) / 0.7);
-  }
-  50% {
-    box-shadow: 0 0 0 8px hsl(var(--color-fd-primary) / 0);
-  }
-}
-
-/* Glassmorphism effect for cards */
+/* Glassmorphism effect ONLY for callouts and hero */
 .glass-card {
   background: hsl(var(--color-fd-card) / 0.7);
   backdrop-filter: blur(12px) saturate(180%);
@@ -157,21 +167,38 @@ pre {
   box-shadow: var(--fd-shadow-lg);
 }
 
-/* Modern callout styling */
+/* Stats cards with subtle background - NO glass effect */
+.stats-card {
+  background: hsl(var(--color-fd-card));
+  border: 1px solid hsl(var(--color-fd-border));
+  box-shadow: var(--fd-shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  box-shadow: var(--fd-shadow);
+  border-color: hsl(var(--color-fd-primary) / 0.3);
+}
+
+/* Modern callout styling with glass effect */
 [data-callout] {
   border-radius: 8px;
   border-left-width: 4px;
   box-shadow: var(--fd-shadow-sm);
+  background: hsl(var(--color-fd-card) / 0.7);
+  backdrop-filter: blur(12px) saturate(180%);
 }
 
 [data-callout="info"] {
   border-left-color: hsl(var(--color-fd-primary));
   background: hsl(var(--color-fd-primary) / 0.05);
+  backdrop-filter: blur(12px) saturate(180%);
 }
 
 [data-callout="warn"] {
   border-left-color: hsl(45 93% 47%);
   background: hsl(45 93% 47% / 0.05);
+  backdrop-filter: blur(12px) saturate(180%);
 }
 
 /* Smooth scrolling */
@@ -179,7 +206,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar with unique blue */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -196,4 +223,19 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--color-fd-primary));
+}
+
+/* Better text rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Clean section headers - no glass effects */
+.prose h1,
+.prose h2,
+.prose h3 {
+  background: transparent;
+  backdrop-filter: none;
 }
