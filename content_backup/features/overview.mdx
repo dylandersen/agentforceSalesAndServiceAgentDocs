@@ -1,0 +1,429 @@
+---
+title: Features Overview
+description: 'Comprehensive guide to all Agentforce capabilities'
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Core Capabilities
+
+Agentforce Sales & Service Agent provides a comprehensive suite of AI-powered features for sales and service automation.
+
+<Cards>
+  <Card title="Record Creation" icon="Plus" href="/docs/features/account-creation">
+    Create Accounts, Opportunities, Cases, and Contacts through conversational AI with custom Lightning Types
+  </Card>
+  
+  <Card title="Intelligence & Analysis" icon="Brain" href="/docs/features/account-intelligence">
+    AI-powered health scoring, similarity matching, and predictive insights
+  </Card>
+  
+  <Card title="Field Management" icon="Settings" href="/docs/features/field-management">
+    Update and manage record fields with undo capability
+  </Card>
+  
+  <Card title="Record Summarization" icon="FileText">
+    AI-powered summaries of accounts, opportunities, and cases
+  </Card>
+</Cards>
+
+## Record Creation Features
+
+### Account Creation
+
+**Account Creation with Lightning Types**
+
+Create accounts through guided conversation with rich custom UI:
+
+**Features**:
+- Custom Lightning Type input form with SLDS2 card interface
+- Required fields: Name, Phone, Website
+- Dynamic Industry/Type picklists from org configuration
+- Full billing address with help text for country format
+- Professional result renderer with formatted output
+- Direct navigation link to created record
+
+**User Experience**:
+```
+User: "Create a new account"
+Agent: [Displays custom form]
+User: [Fills in details with dynamic picklists]
+Agent: [Creates account and shows formatted results with link]
+```
+
+### Opportunity Creation
+
+**Opportunity Creation with Lightning Types**
+
+Create opportunities with account lookup and stage validation:
+
+**Features**:
+- Custom Lightning Type form for data collection
+- Account record picker with validation
+- Dynamic Stage picklist from org configuration
+- Currency formatting for Amount field
+- Optional description field
+- Rich output display with all details
+
+**User Experience**:
+```
+User: "Create an opportunity for Q4 renewal"
+Agent: [Displays opportunity form]
+User: [Selects account, enters details]
+Agent: [Creates opp and displays formatted card]
+```
+
+### Case Creation
+
+**Case Creation with Lightning Types**
+
+Create cases with contact lookup and auto-population:
+
+**Features**:
+- Custom Lightning Type case form
+- Contact record picker (auto-populates Account)
+- Dynamic Priority/Status picklists
+- Subject and Description fields
+- Comprehensive results display
+- Navigation link to case
+
+**User Experience**:
+```
+User: "Create a new support case"
+Agent: [Displays case form]
+User: [Selects contact, case details populated]
+Agent: [Creates case and shows results]
+```
+
+### Contact Creation
+
+**Contact Creation with Lightning Types**
+
+Create contacts with required account association:
+
+**Features**:
+- Custom Lightning Type contact form
+- Required Account association
+- Phone number formatting
+- Extended fields (Title, Department)
+- Email and phone validation
+- Professional output rendering
+
+**User Experience**:
+```
+User: "Add a new contact"
+Agent: [Displays contact form]
+User: [Associates account, enters contact info]
+Agent: [Creates contact and displays details]
+```
+
+## Intelligence Features
+
+### Account Intelligence
+
+**Account Health Scoring & Analysis**
+
+Comprehensive 6-dimension account health analysis:
+
+**Analysis Dimensions**:
+1. **Overall Health Score** (0-100) - Discrete scoring for consistency
+2. **Renewal Risk Assessment** - Churn probability and risk factors
+3. **Expansion Opportunity Score** - Upsell/cross-sell potential
+4. **Sales Engagement Quality** - Touchpoint analysis and relationship strength
+5. **Case Health** - Support ticket trends and resolution rates
+6. **Revenue Intelligence** - Pipeline analysis and closed-won/lost insights
+
+**Features**:
+- Specific data citations with exact metrics
+- Actionable recommendations (3+ sentences per dimension)
+- HTML formatting with bold for key numbers
+- Celebration messaging for wins
+- Business implications for each finding
+
+**Example Output**:
+```
+Overall Health Score: 85/100 🟢
+
+**Renewal Risk Assessment**
+[5+ sentences with specific data about churn risk, including:
+- Open cases count and trends
+- Support ticket resolution rates
+- Customer engagement patterns
+- Specific risk factors identified]
+
+**Expansion Opportunity Score**
+[Detailed upsell/cross-sell analysis...]
+```
+
+### Account Relationship Health Dashboard
+
+**Real-time Health Monitoring**
+
+Modern dashboard component for comprehensive account health:
+
+**Features**:
+- Circular progress gauge with color-coded scoring (95/80/60/40/20)
+- Visual status and trend cards with semantic colors
+- 8 engagement metric cards:
+  - Emails, Tasks, Meetings, Calls
+  - Cases, Opportunities
+  - Closed-Won ACV, Closed-Lost ACV
+- Auto-formatted currency (e.g., $4.2M, $3.2K)
+- One-click refresh with sparkle emoji button (✨)
+- AI-powered insights with HTML bold formatting
+
+**Deployment**:
+- Lightning Web Component: `accountRelationshipHealth`
+- Controller: `AccountRelationshipHealthController`
+- Can be added to Account page layouts
+
+### Opportunity Analysis
+
+**Sales Guidance & Intelligence**
+
+AI-powered opportunity analysis with actionable insights:
+
+**Features**:
+- **Activity Timeline Review** - Email, task, meeting, and call analysis
+- **Deal Momentum Assessment** - Progress evaluation and velocity
+- **Risk Identification** - Potential blockers and concerns
+- **3 Actionable Next Steps** - Specific recommendations
+
+**Similarity Matching**:
+- Semantic matching across 200+ opportunities
+- Weighted scoring algorithm:
+  - Name similarity (25%)
+  - Amount proximity (20%)
+  - Stage matching (20%)
+  - Account match (15%)
+  - Type similarity (10%)
+  - Next step alignment (5%)
+  - Description similarity (5%)
+- HTML output with clickable Lightning URLs
+- Cross-account filtering for better matches
+
+**Example**:
+```
+User: "Analyze this opportunity"
+Agent: [Provides comprehensive analysis including:]
+- "Last 30 days: 5 emails, 3 meetings, 2 tasks"
+- "Deal momentum: Strong progression from..."
+- "Risk: No activity in 2 weeks..."
+- "Next Steps: 1) Schedule demo, 2) Send proposal..."
+```
+
+### Case Analysis
+
+**Priority Scoring & Similarity Matching**
+
+AI-powered case intelligence:
+
+**Priority Analysis**:
+- Scoring breakdown by factor:
+  - Business impact (35%)
+  - Customer tier (25%)
+  - Severity (25%)
+  - SLA risk (15%)
+- Detailed explanations for each score
+- Escalation recommendations
+- Environment and product context
+
+**Similarity Matching**:
+- Semantic case matching across 200+ cases
+- Weighted scoring:
+  - Case type (40%)
+  - Subject similarity (30%)
+  - Description similarity (30%)
+- HTML output with clickable case links
+- Resolution suggestions from similar cases
+
+**Example**:
+```
+User: "Analyze case priority"
+Agent: [Provides scoring breakdown:]
+- "Business Impact: 85/100 - Critical system down"
+- "Customer Tier: 90/100 - Enterprise customer"
+- "Recommended Action: Escalate immediately"
+```
+
+## Field Management
+
+**Update & Undo Field Changes**
+
+Intelligent field management with audit trail:
+
+**Update Features**:
+- Confirmation-based updates
+- Support for all field types
+- Validation before changes
+- Success confirmation
+
+**Undo Features**:
+- Reverse any field change
+- Maintains audit trail
+- Historical value restoration
+- Confirmation messaging
+
+**User Experience**:
+```
+User: "Change the priority to High"
+Agent: "I'll update the Priority field to High. Confirm?"
+User: "Yes"
+Agent: "Priority updated to High. You can undo this anytime."
+
+User: "Undo the last change"
+Agent: "Priority restored to Medium."
+```
+
+## Feature Comparison
+
+<Tabs items={['Record Creation', 'Intelligence', 'Management']}>
+  <Tab value="Record Creation">
+    | Feature | Account | Opportunity | Case | Contact |
+    |---------|---------|-------------|------|---------|
+    | Lightning Type Editor | ✅ | ✅ | ✅ | ✅ |
+    | Dynamic Picklists | ✅ | ✅ | ✅ | ❌ |
+    | Record Lookup | ❌ | ✅ (Account) | ✅ (Contact) | ✅ (Account) |
+    | Address Fields | ✅ | ❌ | ❌ | ❌ |
+    | Result Renderer | ✅ | ✅ | ✅ | ✅ |
+    | Navigation Link | ✅ | ✅ | ✅ | ✅ |
+  </Tab>
+  
+  <Tab value="Intelligence">
+    | Feature | Accounts | Opportunities | Cases |
+    |---------|----------|---------------|-------|
+    | Health Scoring | ✅ (6 dimensions) | ❌ | ❌ |
+    | Priority Analysis | ❌ | ❌ | ✅ (4 factors) |
+    | Similarity Matching | ❌ | ✅ (7 criteria) | ✅ (3 criteria) |
+    | Activity Analysis | ✅ | ✅ | ❌ |
+    | AI Insights | ✅ | ✅ | ✅ |
+    | Recommendations | ✅ | ✅ (3 steps) | ✅ |
+  </Tab>
+  
+  <Tab value="Management">
+    | Feature | Availability |
+    |---------|--------------|
+    | Field Update | ✅ All objects |
+    | Field Undo | ✅ All objects |
+    | Record Summary | ✅ Accounts, Opps, Cases |
+    | Audit Trail | ✅ All changes |
+    | Bulk Operations | ❌ Future enhancement |
+  </Tab>
+</Tabs>
+
+## Usage Patterns
+
+### Conversational Record Creation
+
+<Steps>
+  <Step>
+    **Initiate**: User: "Create a new [record type]"
+  </Step>
+  
+  <Step>
+    **Display Form**: Agent displays custom Lightning Type editor
+  </Step>
+  
+  <Step>
+    **Collect Data**: User fills form with dynamic picklists and validation
+  </Step>
+  
+  <Step>
+    **Validate**: System validates required fields and data formats
+  </Step>
+  
+  <Step>
+    **Create**: Record created in Salesforce
+  </Step>
+  
+  <Step>
+    **Display Results**: Agent shows formatted results with navigation link
+  </Step>
+</Steps>
+
+### AI-Powered Analysis
+
+<Steps>
+  <Step>
+    **Request Analysis**: User: "Analyze [record]"
+  </Step>
+  
+  <Step>
+    **Query Data**: System queries related records and activities
+  </Step>
+  
+  <Step>
+    **AI Processing**: Einstein AI analyzes data and generates insights
+  </Step>
+  
+  <Step>
+    **Format Output**: Results formatted with HTML and specific metrics
+  </Step>
+  
+  <Step>
+    **Display**: Agent presents comprehensive analysis
+  </Step>
+</Steps>
+
+## Performance & Scalability
+
+<Cards>
+  <Card title="Query Limits" icon="Database">
+    - 200 records max for similarity analysis
+    - Indexed field queries
+    - Selective filtering
+    - Relationship optimization
+  </Card>
+  
+  <Card title="AI Token Management" icon="Coins">
+    - 500 char description truncation
+    - Efficient prompt engineering
+    - Batch similar requests
+    - Response caching
+  </Card>
+  
+  <Card title="Governor Limits" icon="Gauge">
+    - Bulk DML operations
+    - Query optimization
+    - Transaction management
+    - Asynchronous processing
+  </Card>
+</Cards>
+
+## Next Steps
+
+<Cards>
+  <Card
+    title="Account Creation"
+    icon="Building"
+    href="/docs/features/account-creation"
+  >
+    Learn about account creation with Lightning Types
+  </Card>
+  
+  <Card
+    title="Account Intelligence"
+    icon="Brain"
+    href="/docs/features/account-intelligence"
+  >
+    Explore 6-dimension health scoring
+  </Card>
+  
+  <Card
+    title="Opportunity Analysis"
+    icon="TrendingUp"
+    href="/docs/features/opportunity-analysis"
+  >
+    Discover sales guidance features
+  </Card>
+  
+  <Card
+    title="Case Analysis"
+    icon="Ticket"
+    href="/docs/features/case-analysis"
+  >
+    Understand priority scoring
+  </Card>
+</Cards>

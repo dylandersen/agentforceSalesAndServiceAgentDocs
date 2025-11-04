@@ -1,0 +1,444 @@
+---
+title: Prerequisites
+description: 'Requirements before deploying Agentforce Sales & Service Agent'
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## System Requirements
+
+Before deploying Agentforce Sales & Service Agent, ensure your Salesforce org meets these requirements:
+
+### Salesforce Edition
+
+- ✓ Salesforce Enterprise Edition or higher
+- ✓ Unlimited Edition (recommended for production)
+- ✓ Developer Edition (for testing)
+
+<Callout type="warn">
+Professional Edition does NOT support Agentforce or Flows. Enterprise Edition or higher is required.
+</Callout>
+
+### Feature Licenses
+
+**Agentforce**
+
+**Required**: Agentforce must be enabled in your org
+
+**How to Check**:
+1. Navigate to **Setup → Agentforce Setup**
+2. Verify Agentforce is enabled
+3. Check that you have available agent licenses
+
+**How to Enable**:
+- Contact your Salesforce Account Executive
+- Request Agentforce add-on license
+- Follow setup wizard in Setup → Agentforce Setup
+
+**Einstein Generative AI**
+
+**Required**: For AI-powered analysis features
+
+**How to Check**:
+1. Navigate to **Setup → Einstein Setup**
+2. Look for "Einstein Generative AI" section
+3. Verify "Einstein for Salesforce" is enabled
+
+**How to Enable**:
+- Setup → Einstein Setup
+- Click "Turn On Einstein"
+- Enable "Einstein for Salesforce"
+- Accept terms and conditions
+
+**Lightning Experience**
+
+**Required**: All Lightning Types require Lightning Experience
+
+**How to Check**:
+- Your org should be using Lightning Experience (not Salesforce Classic)
+- Check for Lightning Experience interface
+
+**How to Enable**:
+- Setup → Lightning Experience Transition
+- Enable Lightning Experience
+- Set as default for users
+
+**Flow Automation**
+
+**Required**: Flow automation must be enabled
+
+**How to Check**:
+- Navigate to **Setup → Process Automation Settings**
+- Verify "Enable Flow" is checked
+
+**Note**: This is enabled by default in Enterprise Edition and above
+
+## User Permissions
+
+### System Administrator
+
+The deploying user must have:
+
+- ✓ System Administrator profile OR
+- ✓ Customize Application permission
+- ✓ Manage Flows permission
+- ✓ View All Data permission
+- ✓ Author Apex permission
+- ✓ Deploy Lightning Web Components permission
+
+### End Users
+
+Users who will use Agentforce need:
+
+- ✓ Standard User profile OR
+- ✓ Custom profile with appropriate permissions
+- ✓ Access to Agentforce agents
+- ✓ Read/Create/Edit permissions on Account, Opportunity, Case, Contact
+- ✓ Field-level security access to all fields
+
+## Technical Requirements
+
+### Development Tools
+
+For deploying from source:
+
+<Tabs items={['Salesforce CLI (Recommended)', 'VS Code (Optional)', 'Git (Optional)']}>
+  <Tab value="Salesforce CLI (Recommended)">
+    Install Salesforce CLI:
+    
+    ```bash
+    # macOS (Homebrew)
+    brew install sf
+    
+    # Windows (Chocolatey)
+    choco install sfdx-cli
+    
+    # npm (All platforms)
+    npm install -g @salesforce/cli
+    ```
+    
+    Verify installation:
+    ```bash
+    sf --version
+    ```
+  </Tab>
+  
+  <Tab value="VS Code (Optional)">
+    Install VS Code with Salesforce extensions:
+    
+    1. Download VS Code from https://code.visualstudio.com
+    2. Install "Salesforce Extension Pack" from marketplace
+    3. Configure Salesforce CLI integration
+    
+    **Benefits**:
+    - Syntax highlighting
+    - Code completion
+    - Integrated deployment
+    - Debugging tools
+  </Tab>
+  
+  <Tab value="Git (Optional)">
+    For version control:
+    
+    ```bash
+    # macOS
+    brew install git
+    
+    # Windows
+    # Download from https://git-scm.com
+    
+    # Verify
+    git --version
+    ```
+  </Tab>
+</Tabs>
+
+### Org Connection
+
+Authenticate to your target org:
+
+```bash
+# Authenticate to org
+sf org login web --alias my-org
+
+# Set as default
+sf config set target-org my-org
+
+# Verify connection
+sf org display
+```
+
+## API Limits
+
+Ensure your org has sufficient API limits:
+
+<Cards>
+  <Card title="API Calls" icon="Plug">
+    **Required**: 5,000+ API calls/day
+    
+    **Usage**:
+    - Deployment: ~100-500 calls
+    - Daily operations: ~1,000 calls
+    - AI calls: Varies by usage
+    
+    **Check**: Setup → System Overview → API Usage
+  </Card>
+  
+  <Card title="Data Storage" icon="Database">
+    **Required**: 100+ MB available
+    
+    **Usage**:
+    - Metadata: ~10-20 MB
+    - Custom objects: Varies
+    - Logs: ~10-50 MB
+    
+    **Check**: Setup → System Overview → Data Storage
+  </Card>
+  
+  <Card title="File Storage" icon="Folder">
+    **Required**: 50+ MB available
+    
+    **Usage**:
+    - Lightning components: ~5-10 MB
+    - Static resources: Minimal
+    
+    **Check**: Setup → System Overview → File Storage
+  </Card>
+  
+  <Card title="Einstein Tokens" icon="Coins">
+    **Required**: Einstein token allocation
+    
+    **Usage**:
+    - Varies by AI feature usage
+    - Account intelligence: ~500 tokens
+    - Opportunity analysis: ~300 tokens
+    
+    **Check**: Einstein Setup → Usage
+  </Card>
+</Cards>
+
+## Data Requirements
+
+### Existing Data
+
+For testing and demonstration:
+
+<Tabs items={['Accounts', 'Opportunities', 'Cases', 'Contacts']}>
+  <Tab value="Accounts">
+    **Recommended**: 10+ accounts with:
+    - Complete address information
+    - Industry and Type populated
+    - Phone and Website
+    - Related opportunities and cases
+  </Tab>
+  
+  <Tab value="Opportunities">
+    **Recommended**: 20+ opportunities with:
+    - Various stages
+    - Different amounts ($10K - $500K)
+    - Associated accounts
+    - Activities (tasks, emails)
+    - Some closed-won and closed-lost
+  </Tab>
+  
+  <Tab value="Cases">
+    **Recommended**: 15+ cases with:
+    - Various priorities and statuses
+    - Different types
+    - Detailed descriptions
+    - Associated contacts
+    - Mix of open and closed
+  </Tab>
+  
+  <Tab value="Contacts">
+    **Recommended**: 20+ contacts with:
+    - Associated accounts
+    - Email and phone
+    - Titles and departments
+    - Mix of roles
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+Sample data is optional but highly recommended for testing all features. You can use Salesforce's built-in sample data or create your own.
+</Callout>
+
+## Environment Preparation
+
+### Sandbox First
+
+<Callout type="warn">
+**Always deploy to a sandbox first!** Never deploy directly to production.
+</Callout>
+
+Recommended deployment path:
+
+<Steps>
+  <Step>
+    **Developer Sandbox**: Test basic functionality and customizations
+  </Step>
+  
+  <Step>
+    **Partial Copy Sandbox**: Test with production-like data
+  </Step>
+  
+  <Step>
+    **Full Sandbox**: Complete user acceptance testing (UAT)
+  </Step>
+  
+  <Step>
+    **Production**: Deploy during maintenance window
+  </Step>
+</Steps>
+
+### Backup Plan
+
+Before deployment:
+
+- ✓ Export metadata of existing customizations
+- ✓ Document current configuration
+- ✓ Create changeset for rollback if needed
+- ✓ Notify users of upcoming changes
+
+## Verification Checklist
+
+Before proceeding to installation, verify:
+
+**Org Configuration**
+
+- [ ] Salesforce Enterprise Edition or higher
+- [ ] Agentforce enabled
+- [ ] Einstein Generative AI enabled
+- [ ] Lightning Experience active
+- [ ] Flow automation enabled
+
+**User Access**
+
+- [ ] System Administrator access
+- [ ] Customize Application permission
+- [ ] Manage Flows permission
+- [ ] Author Apex permission
+
+**Development Tools**
+
+- [ ] Salesforce CLI installed
+- [ ] Org authentication configured
+- [ ] VS Code (optional) installed
+- [ ] Git (optional) configured
+
+**Org Limits**
+
+- [ ] Sufficient API calls available
+- [ ] Data storage available
+- [ ] File storage available
+- [ ] Einstein tokens allocated
+
+**Test Data**
+
+- [ ] Sample accounts created
+- [ ] Sample opportunities created
+- [ ] Sample cases created
+- [ ] Sample contacts created
+
+**Backup & Rollback**
+
+- [ ] Current metadata backed up
+- [ ] Rollback plan documented
+- [ ] Users notified
+- [ ] Maintenance window scheduled
+
+## Common Issues
+
+**Agentforce Not Available**
+
+**Issue**: Can't find Agentforce in Setup
+
+**Solution**:
+- Verify org edition (Enterprise+ required)
+- Contact Salesforce to enable Agentforce
+- Check license allocation
+
+**Einstein AI Not Working**
+
+**Issue**: AI features unavailable
+
+**Solution**:
+- Enable Einstein for Salesforce in Setup
+- Accept terms and conditions
+- Wait 15-30 minutes for provisioning
+- Verify Einstein Setup shows "Active"
+
+**API Limit Warnings**
+
+**Issue**: Low API limit warnings during deployment
+
+**Solution**:
+- Deploy during off-peak hours
+- Reduce concurrent operations
+- Consider API limit increase
+- Monitor usage in System Overview
+
+**Insufficient Permissions**
+
+**Issue**: "Insufficient privileges" errors
+
+**Solution**:
+- Verify System Administrator profile
+- Check Customize Application permission
+- Ensure Manage Flows permission
+- Contact org administrator
+
+## Next Steps
+
+<Cards>
+  <Card
+    title="Installation Guide"
+    icon="Rocket"
+    href="/docs/deployment/installation"
+  >
+    Ready to deploy? Follow the installation guide
+  </Card>
+  
+  <Card
+    title="Troubleshooting"
+    icon="Wrench"
+    href="/troubleshooting/common-issues"
+  >
+    Having issues? Check troubleshooting guide
+  </Card>
+  
+  <Card
+    title="Field Security"
+    icon="Shield"
+    href="/docs/deployment/field-security"
+  >
+    Learn about required field permissions
+  </Card>
+  
+  <Card
+    title="Testing"
+    icon="FlaskConical"
+    href="/docs/deployment/testing"
+  >
+    Plan your testing strategy
+  </Card>
+</Cards>
+
+## Support Resources
+
+<Cards>
+  <Card title="Salesforce Help" icon="CircleHelp" href="https://help.salesforce.com">
+    Official Salesforce documentation
+  </Card>
+  
+  <Card title="Trailhead" icon="GraduationCap" href="https://trailhead.salesforce.com">
+    Free learning resources
+  </Card>
+  
+  <Card title="Community" icon="Users" href="https://trailblazercommunity.salesforce.com">
+    Connect with other developers
+  </Card>
+</Cards>

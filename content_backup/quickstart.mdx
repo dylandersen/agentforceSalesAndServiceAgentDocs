@@ -1,0 +1,246 @@
+---
+title: Quick Start
+description: 'Get up and running with Agentforce Sales & Service Agent in minutes'
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- ✓ Salesforce org with Agentforce enabled
+- ✓ Einstein AI Models enabled in your org
+- ✓ System Administrator access
+- ✓ Salesforce CLI installed (optional but recommended)
+
+## Installation
+
+<Steps>
+  <Step>
+    **Clone or Download**
+    
+    Get the project files from your repository:
+    
+    ```bash
+    git clone <repository-url>
+    cd agentforceSalesAndServiceAgent
+    ```
+  </Step>
+
+  <Step>
+    **Deploy Apex Classes**
+    
+    Deploy all Apex classes and test classes first:
+    
+    ```bash
+    sf project deploy start --source-dir force-app/main/default/classes
+    ```
+    
+    <Callout type="info">
+      Apex classes must be deployed before Lightning Types that reference them.
+    </Callout>
+  </Step>
+
+  <Step>
+    **Deploy Lightning Web Components & Lightning Types**
+    
+    Deploy LWCs and Lightning Types together in a single deployment:
+    
+    ```bash
+    sf project deploy start --source-dir force-app/main/default/lwc,force-app/main/default/lightningTypes
+    ```
+    
+    <Callout type="warn">
+      Lightning Type bundles reference LWCs. They must be deployed together to ensure LWC references resolve correctly.
+    </Callout>
+  </Step>
+
+  <Step>
+    **Deploy Flows and GenAI Components**
+    
+    Deploy the orchestration and AI components:
+    
+    ```bash
+    sf project deploy start --source-dir force-app/main/default/flows
+    sf project deploy start --source-dir force-app/main/default/genAiFunctions
+    sf project deploy start --source-dir force-app/main/default/genAiPlugins
+    ```
+  </Step>
+
+  <Step>
+    **Configure Field-Level Security**
+    
+    Set up field permissions for System Administrator and Standard User profiles:
+    
+    - Navigate to **Setup → Object Manager → [Object] → Fields**
+    - For each custom field, set:
+      - System Administrator: Create/Read/Edit/Delete
+      - Standard User: Create/Read/Edit/Delete
+  </Step>
+
+  <Step>
+    **Configure Your Agent**
+    
+    Add the GenAI Plugins to your Agentforce agent:
+    
+    1. Go to **Setup → Agents**
+    2. Select or create an agent
+    3. Add these plugins:
+       - Create Account with Agentforce
+       - Create Opportunities with Agentforce
+       - Create Case with Agentforce
+       - Create Contact with Agentforce
+       - Account Intelligence
+       - Opportunity Intelligence
+       - Priority Intelligence
+  </Step>
+</Steps>
+
+## Verify Installation
+
+Test your installation with these simple commands:
+
+<Tabs items={['Account Creation', 'Account Intelligence', 'Opportunity Creation']}>
+  <Tab value="Account Creation">
+    ```
+    User: "Create a new account for Acme Corporation"
+    Agent: [Displays custom Lightning Type form]
+    User: [Fills in details]
+    Agent: [Creates account and displays formatted results]
+    ```
+  </Tab>
+  
+  <Tab value="Account Intelligence">
+    ```
+    User: "Analyze this account's health"
+    Agent: [Provides comprehensive 6-dimension health analysis]
+    ```
+  </Tab>
+  
+  <Tab value="Opportunity Creation">
+    ```
+    User: "Create a new opportunity for Q4 renewal"
+    Agent: [Displays opportunity form with dynamic stage picklist]
+    User: [Enters details]
+    Agent: [Creates opportunity with formatted output]
+    ```
+  </Tab>
+</Tabs>
+
+## Quick Usage Examples
+
+### Create an Account
+
+<Steps>
+  <Step>
+    **Start Conversation**: "Create a new account"
+  </Step>
+  <Step>
+    **Provide Details**: Fill in the custom Lightning Type form with:
+    - Name (required)
+    - Phone (required)
+    - Website (required)
+    - Industry (picklist)
+    - Type (picklist)
+    - Billing Address (optional)
+  </Step>
+  <Step>
+    **Submit**: Agent creates the account and displays formatted results with navigation link
+  </Step>
+</Steps>
+
+### Analyze Account Health
+
+```text title="Conversation Example"
+User: "Analyze the health of this account"
+
+Agent: "I'll analyze the account health for you."
+
+[Performs 6-dimension analysis]
+
+Agent: "Here's the comprehensive health analysis:
+
+Overall Health Score: 85/100 🟢
+
+**Renewal Risk Assessment**
+- [Detailed analysis with specific data]
+- [Business implications]
+- [Actionable recommendations]
+
+**Expansion Opportunity Score**
+- [Growth potential analysis]
+- [Revenue opportunities]
+- [Next steps]
+
+[...continues with all 6 dimensions]"
+```
+
+### Create an Opportunity
+
+<Steps>
+  <Step>
+    **Initiate**: "Create a new opportunity for Acme Corp"
+  </Step>
+  <Step>
+    **Fill Form**:
+    - Account: Acme Corporation
+    - Opportunity Name: Q4 Software License Renewal
+    - Amount: $50,000
+    - Stage: Negotiation/Review (from dynamic picklist)
+    - Description: Expansion by 20%
+  </Step>
+  <Step>
+    **Confirm**: Agent confirms details and creates the opportunity
+  </Step>
+</Steps>
+
+## What's Next?
+
+<Cards>
+  <Card
+    title="Explore Features"
+    icon="Compass"
+    href="/docs/features/overview"
+  >
+    Learn about all available capabilities
+  </Card>
+  <Card
+    title="Architecture Deep Dive"
+    icon="Network"
+    href="/docs/architecture/overview"
+  >
+    Understand how everything works together
+  </Card>
+  <Card
+    title="Troubleshooting"
+    icon="Wrench"
+    href="/troubleshooting/common-issues"
+  >
+    Solve common deployment issues
+  </Card>
+  <Card
+    title="API Reference"
+    icon="Book"
+    href="/api-reference/apex-classes"
+  >
+    Explore the technical documentation
+  </Card>
+</Cards>
+
+## Need Help?
+
+<Cards>
+  <Card title="Common Issues" icon="CircleHelp" href="/troubleshooting/common-issues">
+    Find solutions to frequent problems
+  </Card>
+  <Card title="Best Practices" icon="Lightbulb" href="/troubleshooting/best-practices">
+    Learn deployment best practices
+  </Card>
+  <Card title="Community" icon="Users" href="https://trailblazercommunity.salesforce.com">
+    Join the Trailblazer Community
+  </Card>
+</Cards>

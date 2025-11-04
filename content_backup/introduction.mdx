@@ -1,0 +1,166 @@
+---
+title: Introduction
+description: 'Welcome to Agentforce Sales & Service Agent with Lightning Types'
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.svg"
+  alt="Hero Light"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.svg"
+  alt="Hero Dark"
+/>
+
+## Welcome to Agentforce Sales & Service Agent
+
+A comprehensive Salesforce Agentforce implementation providing AI-powered record creation (Accounts, Opportunities, Cases, Contacts), intelligent analysis, similarity matching, record summarization, and field management with custom Lightning Types for enhanced input/output components.
+
+<Cards>
+  <Card
+    title="Quick Start"
+    icon="Rocket"
+    href="/docs/quickstart"
+  >
+    Get up and running with Agentforce in minutes
+  </Card>
+  <Card
+    title="Architecture"
+    icon="Network"
+    href="/docs/architecture/overview"
+  >
+    Understand the hybrid architecture design
+  </Card>
+  <Card
+    title="Features"
+    icon="Sparkles"
+    href="/docs/features/overview"
+  >
+    Explore all AI-powered capabilities
+  </Card>
+  <Card
+    title="API Reference"
+    icon="Code"
+    href="/api-reference/apex-classes"
+  >
+    Dive into the technical implementation
+  </Card>
+</Cards>
+
+## Key Capabilities
+
+**Record Creation with Lightning Types**
+
+Create Accounts, Opportunities, Cases, and Contacts through conversational AI with custom Lightning Type UI components featuring:
+- Custom input editors with SLDS2 card interfaces
+- Dynamic picklist loading from org configuration
+- Professional result renderers with formatted output
+- Real-time validation and help text
+
+**AI-Powered Intelligence**
+
+Comprehensive analysis capabilities including:
+- **Account Intelligence**: 6-dimension health scoring with Overall Health Score (0-100)
+- **Opportunity Analysis**: Sales guidance with activity timeline and deal momentum
+- **Case Priority Analysis**: AI-powered priority scoring and recommendations
+- **Similarity Matching**: Semantic matching for opportunities and cases
+
+**Smart Field Management**
+
+Update and manage record fields with confidence:
+- Confirmation-based field updates
+- Undo capability for all changes
+- Support for all field types
+- Audit trail maintenance
+
+**Custom Lightning Types**
+
+Rich UI components for data collection and display:
+- Custom input editors for structured data
+- Beautiful output renderers with card layouts
+- Type safety through JSON schema validation
+- Reusable patterns across all functions
+
+## Version 0.5 Highlights
+
+<Callout type="info">
+  **New in Version 0.5**: Account Relationship Health Dashboard with real-time monitoring, circular progress gauge, 8 engagement metric cards, and AI-powered insights with HTML formatting.
+</Callout>
+
+### Latest Features
+
+- **Account Relationship Health LWC** - Modern dashboard with color-coded scoring and engagement metrics
+- **Enhanced AI Analysis** - Improved insights with specific data citations and celebration messaging
+- **Rich Output Formatting** - HTML bold formatting and auto-formatted currency displays
+- **One-Click Refresh** - Interactive updates with sparkle emoji button (✨)
+
+## Design Philosophy
+
+This project implements a **hybrid architecture** combining:
+
+<Cards>
+  <Card title="Apex Classes" icon="Code">
+    Complex business logic, AI integration, and SOQL queries
+  </Card>
+  <Card title="Flows" icon="GitBranch">
+    Orchestration and non-developer friendly configuration
+  </Card>
+  <Card title="GenAI Functions" icon="Bot">
+    Natural language interfaces with schema validation
+  </Card>
+  <Card title="Lightning Types" icon="Layout">
+    Rich custom UI components for input/output
+  </Card>
+</Cards>
+
+## What You'll Learn
+
+<Steps>
+  <Step>
+    **Architecture**: Understand the hybrid approach combining Apex, Flows, GenAI Functions, and Lightning Types
+  </Step>
+  <Step>
+    **Implementation**: Learn how to implement custom Lightning Types and AI-powered analysis
+  </Step>
+  <Step>
+    **Deployment**: Deploy the complete solution with proper field-level security
+  </Step>
+  <Step>
+    **Usage**: Use Agentforce for conversational record creation and intelligent analysis
+  </Step>
+</Steps>
+
+## Ready to Get Started?
+
+Choose your path:
+
+<Cards>
+  <Card
+    title="New to Agentforce?"
+    icon="GraduationCap"
+    href="/docs/quickstart"
+  >
+    Start with our quick start guide
+  </Card>
+  <Card
+    title="Developer?"
+    icon="Code"
+    href="/docs/architecture/overview"
+  >
+    Dive into the architecture
+  </Card>
+  <Card
+    title="Ready to Deploy?"
+    icon="Rocket"
+    href="/docs/deployment/prerequisites"
+  >
+    Begin the deployment process
+  </Card>
+</Cards>
+

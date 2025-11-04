@@ -1,0 +1,570 @@
+---
+title: Installation Guide
+description: 'Step-by-step deployment instructions'
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Deployment Overview
+
+This guide walks through deploying Agentforce Sales & Service Agent to your Salesforce org.
+
+<Callout type="warn">
+**Deploy to a sandbox first!** Always test in a non-production environment before deploying to production.
+</Callout>
+
+## Deployment Checklist
+
+Before starting, ensure you've completed:
+
+- ✓ All prerequisites verified (see [Prerequisites](/docs/deployment/prerequisites))
+- ✓ Authenticated to target org with Salesforce CLI
+- ✓ Backed up existing metadata
+- ✓ Notified users of deployment
+
+## Deployment Steps
+
+<Steps>
+  <Step>
+    **Clone or Download Repository**
+    
+    Get the project files:
+    
+    ```bash
+    # If using Git
+    git clone <repository-url>
+    cd agentforceSalesAndServiceAgent
+    
+    # Or download and extract ZIP
+    # Then navigate to extracted folder
+    ```
+  </Step>
+
+  <Step>
+    **Verify Org Connection**
+    
+    Confirm you're connected to the correct org:
+    
+    ```bash
+    # Check current org
+    sf org display
+    
+    # Should show target org details
+    # If wrong org, authenticate again:
+    sf org login web --alias correct-org
+    sf config set target-org correct-org
+    ```
+  </Step>
+
+  <Step>
+    **Deploy Apex Classes**
+    
+    Deploy all Apex classes and test classes first:
+    
+    ```bash
+    sf project deploy start \
+      --source-dir force-app/main/default/classes \
+      --test-level RunLocalTests \
+      --wait 30
+    ```
+    
+    <Callout type="info">
+    **Why first?** Lightning Types reference Apex classes, so classes must exist before Lightning Types can be deployed.
+    </Callout>
+    
+    **Expected Output**:
+    ```
+    Deployed 44 Apex classes
+    Deployed 43 Apex class metadata files
+    Test Success Rate: 100%
+    Code Coverage: 85%+
+    ```
+  </Step>
+
+  <Step>
+    **Deploy LWCs and Lightning Types Together**
+    
+    **Critical**: Deploy Lightning Web Components and Lightning Types in a single deployment:
+    
+    ```bash
+    sf project deploy start \
+      --source-dir force-app/main/default/lwc,force-app/main/default/lightningTypes \
+      --wait 30
+    ```
+    
+    <Callout type="warn">
+    **Critical Deployment Order**: Lightning Type bundles reference LWCs in their editor.json and renderer.json files. If you deploy Lightning Types before the LWCs exist, Salesforce will throw: "Something's not right with the definition name c/componentName."
+    
+    **Solution**: Always deploy LWCs and Lightning Types together in the same deployment to ensure LWC references resolve correctly.
+    </Callout>
+    
+    **Expected Output**:
+    ```
+    Deployed 10 Lightning Web Components
+    Deployed 10 Lightning Type bundles
+    ```
+  </Step>
+
+  <Step>
+    **Deploy Flows**
+    
+    Deploy all flows:
+    
+    ```bash
+    sf project deploy start \
+      --source-dir force-app/main/default/flows \
+      --wait 20
+    ```
+    
+    **Expected Output**:
+    ```
+    Deployed 13 flows
+    All flows active
+    ```
+    
+    <Callout type="info">
+    Flows may auto-activate during deployment. If not, activate them manually in Setup → Flows.
+    </Callout>
+  </Step>
+
+  <Step>
+    **Deploy GenAI Functions**
+    
+    Deploy GenAI Function metadata:
+    
+    ```bash
+    sf project deploy start \
+      --source-dir force-app/main/default/genAiFunctions \
+      --wait 15
+    ```
+    
+    **Expected Output**:
+    ```
+    Deployed 14 GenAI Functions
+    All functions active
+    ```
+  </Step>
+
+  <Step>
+    **Deploy GenAI Plugins**
+    
+    Deploy GenAI Plugin metadata:
+    
+    ```bash
+    sf project deploy start \
+      --source-dir force-app/main/default/genAiPlugins \
+      --wait 10
+    ```
+    
+    **Expected Output**:
+    ```
+    Deployed 12 GenAI Plugins
+    ```
+  </Step>
+
+  <Step>
+    **Deploy GenAI Prompt Templates**
+    
+    Deploy prompt templates (if any):
+    
+    ```bash
+    sf project deploy start \
+      --source-dir force-app/main/default/genAiPromptTemplates \
+      --wait 10
+    ```
+    
+    **Expected Output**:
+    ```
+    Deployed 5 prompt templates
+    ```
+  </Step>
+
+  <Step>
+    **Deploy Custom Objects (if needed)**
+    
+    Deploy any custom objects or field extensions:
+    
+    ```bash
+    sf project deploy start \
+      --source-dir force-app/main/default/objects \
+      --wait 15
+    ```
+    
+    <Callout type="info">
+    This project primarily extends standard objects. Custom objects are optional.
+    </Callout>
+  </Step>
+</Steps>
+
+## Alternative: Deploy All at Once
+
+For experienced admins, deploy everything in one command:
+
+```bash
+sf project deploy start \
+  --manifest manifest/package.xml \
+  --test-level RunLocalTests \
+  --wait 45
+```
+
+<Callout type="warn">
+This approach requires the deployment order to be correct in package.xml. The step-by-step approach is recommended for first-time deployments.
+</Callout>
+
+## Post-Deployment Configuration
+
+After successful deployment:
+
+### 1. Configure Field-Level Security
+
+<Steps>
+  <Step>
+    **Navigate to Object Manager**: Setup → Object Manager → [Select Object]
+  </Step>
+
+  <Step>
+    **Configure Fields**: For each custom field:
+    
+    1. Click the field name
+    2. Click "Set Field-Level Security"
+    3. Configure:
+       - **System Administrator**: ✅ Read, ✅ Edit
+       - **Standard User**: ✅ Read, ✅ Edit
+    4. Click "Save"
+  </Step>
+
+  <Step>
+    **Repeat for All Objects**: Configure fields on:
+    - Account
+    - Opportunity
+    - Case
+    - Contact
+  </Step>
+</Steps>
+
+See [Field Security](/docs/deployment/field-security) for detailed instructions.
+
+### 2. Configure Agentforce Agent
+
+<Steps>
+  <Step>
+    **Navigate to Agents**: Setup → Agentforce Setup → Agents
+  </Step>
+
+  <Step>
+    **Create or Select Agent**:
+    - Create new agent: Click "New Agent"
+    - Or select existing agent to enhance
+  </Step>
+
+  <Step>
+    **Add GenAI Plugins**: In agent configuration, add these plugins:
+    
+    - ✅ Create Account with Agentforce
+    - ✅ Create Opportunities with Agentforce
+    - ✅ Create Case with Agentforce
+    - ✅ Create Contact with Agentforce
+    - ✅ Account Intelligence
+    - ✅ Opportunity Intelligence
+    - ✅ Priority Intelligence
+    - ✅ Record Summarization
+  </Step>
+
+  <Step>
+    **Configure Agent Settings**:
+    - Set agent name and description
+    - Configure greeting message
+    - Set escalation rules (optional)
+    - Configure channels (Chat, Messaging)
+  </Step>
+
+  <Step>
+    **Activate Agent**: Click "Activate" to make agent available to users
+  </Step>
+</Steps>
+
+### 3. Add Components to Page Layouts (Optional)
+
+For the Account Relationship Health dashboard:
+
+<Steps>
+  <Step>
+    **Navigate to Account Page Layout**: Setup → Object Manager → Account → Lightning Record Pages
+  </Step>
+
+  <Step>
+    **Edit Page Layout**: Click "Edit" on desired page layout
+  </Step>
+
+  <Step>
+    **Add LWC Component**: Drag `accountRelationshipHealth` component to page
+  </Step>
+
+  <Step>
+    **Save and Activate**: Save changes and assign to org/app/profiles
+  </Step>
+</Steps>
+
+## Verification
+
+After deployment, verify everything is working:
+
+### 1. Check Deployment Status
+
+```bash
+# View recent deployments
+sf project deploy report
+
+# Check specific deployment
+sf project deploy report --job-id <deployment-id>
+```
+
+### 2. Verify Components in Org
+
+<Tabs items={['Apex Classes', 'Flows', 'Lightning Types', 'GenAI Functions', 'GenAI Plugins']}>
+  <Tab value="Apex Classes">
+    Setup → Apex Classes
+    
+    Verify these classes exist:
+    - AccountCreationAgent
+    - AccountIntelligence
+    - OpportunityCreationAgent
+    - CaseCreationAgent
+    - ContactCreationAgent
+    - [All helper classes]
+  </Tab>
+
+  <Tab value="Flows">
+    Setup → Flows
+    
+    Verify these flows are **Active**:
+    - Create_Account_with_Agent
+    - Create_Opportunity_with_Agent
+    - Create_Case_with_Agent
+    - Create_Contact_with_Agent
+    - Analyze_Account_Flow
+    - [All analysis flows]
+  </Tab>
+
+  <Tab value="Lightning Types">
+    Setup → Lightning Types
+    
+    Verify these types exist:
+    - accountInput
+    - accountResult
+    - opportunityInput
+    - opportunityResult
+    - caseInput
+    - caseResult
+    - contactInput
+    - contactResult
+    - accountHealthResult
+  </Tab>
+
+  <Tab value="GenAI Functions">
+    Setup → GenAI Functions
+    
+    Verify these functions are **Active**:
+    - Create_Account_with_Agent
+    - Create_Opportunity_with_Agent
+    - Create_Case_with_Agent
+    - Create_Contact_with_Agent
+    - Analyze_Account
+    - [All analysis functions]
+  </Tab>
+
+  <Tab value="GenAI Plugins">
+    Setup → GenAI Plugins
+    
+    Verify these plugins exist:
+    - Create Account with Agentforce
+    - Create Opportunities with Agentforce
+    - Create Case with Agentforce
+    - Create Contact with Agentforce
+    - Account Intelligence
+    - [All intelligence plugins]
+  </Tab>
+</Tabs>
+
+### 3. Test Basic Functionality
+
+<Tabs items={['Account Creation', 'Account Intelligence', 'Opportunity Creation']}>
+  <Tab value="Account Creation">
+    1. Open Agentforce chat
+    2. Type: "Create a new account"
+    3. Verify custom form appears
+    4. Fill in details
+    5. Verify account created successfully
+  </Tab>
+
+  <Tab value="Account Intelligence">
+    1. Navigate to an account record
+    2. Open Agentforce chat
+    3. Type: "Analyze this account's health"
+    4. Verify 6-dimension analysis appears
+  </Tab>
+
+  <Tab value="Opportunity Creation">
+    1. Open Agentforce chat
+    2. Type: "Create a new opportunity"
+    3. Verify form with account lookup
+    4. Fill in details
+    5. Verify opportunity created
+  </Tab>
+</Tabs>
+
+See [Testing Guide](/docs/deployment/testing) for comprehensive test scenarios.
+
+## Rollback Procedure
+
+If deployment fails or issues arise:
+
+### Option 1: Redeploy Previous Version
+
+```bash
+# If you have previous version
+sf project deploy start \
+  --source-dir /path/to/backup \
+  --wait 30
+```
+
+### Option 2: Delete Deployed Components
+
+```bash
+# Create destructiveChanges.xml
+# Then deploy with:
+sf project deploy start \
+  --manifest manifest/destructiveChanges.xml \
+  --wait 30
+```
+
+### Option 3: Manual Removal
+
+<Steps>
+  <Step>
+    **Deactivate Flows**: Setup → Flows → Deactivate each flow
+  </Step>
+
+  <Step>
+    **Delete GenAI Components**:
+    - Setup → GenAI Functions → Delete each function
+    - Setup → GenAI Plugins → Delete each plugin
+  </Step>
+
+  <Step>
+    **Delete Lightning Types**: Setup → Lightning Types → Delete each type
+  </Step>
+
+  <Step>
+    **Delete Apex Classes**: Setup → Apex Classes → Delete each class
+  </Step>
+</Steps>
+
+## Common Deployment Issues
+
+**LWC Reference Error**
+
+**Error**: "Something's not right with the definition name c/componentName"
+
+**Cause**: Lightning Type deployed before LWC exists
+
+**Solution**: Deploy LWCs and Lightning Types together in single deployment:
+```bash
+sf project deploy start \
+  --source-dir force-app/main/default/lwc,force-app/main/default/lightningTypes
+```
+
+**Test Coverage Failure**
+
+**Error**: "Average test coverage is X%, at least 75% is required"
+
+**Solution**:
+- Ensure all test classes deployed
+- Run tests manually: `sf apex run test --test-level RunLocalTests`
+- Fix failing tests
+- Redeploy
+
+**Flow Won't Activate**
+
+**Error**: "This flow has unresolved errors"
+
+**Solution**:
+- Check Apex classes exist
+- Verify Lightning Types deployed
+- Review flow error messages
+- Fix references and redeploy
+
+**Permission Errors**
+
+**Error**: "You do not have sufficient privileges"
+
+**Solution**:
+- Verify System Administrator access
+- Check deployment user permissions
+- Ensure Customize Application permission
+- Contact org administrator
+
+**API Limit Exceeded**
+
+**Error**: "API request limit exceeded"
+
+**Solution**:
+- Wait for limits to reset (daily)
+- Deploy during off-peak hours
+- Reduce concurrent operations
+- Contact Salesforce for limit increase
+
+## Next Steps
+
+<Cards>
+  <Card
+    title="Field Security"
+    icon="Shield"
+    href="/docs/deployment/field-security"
+  >
+    Configure field-level security permissions
+  </Card>
+  
+  <Card
+    title="Testing Guide"
+    icon="FlaskConical"
+    href="/docs/deployment/testing"
+  >
+    Test all functionality comprehensively
+  </Card>
+  
+  <Card
+    title="Troubleshooting"
+    icon="Wrench"
+    href="/troubleshooting/common-issues"
+  >
+    Solve common deployment issues
+  </Card>
+  
+  <Card
+    title="Features"
+    icon="Sparkles"
+    href="/docs/features/overview"
+  >
+    Explore all available features
+  </Card>
+</Cards>
+
+## Need Help?
+
+<Cards>
+  <Card title="Common Issues" icon="CircleHelp" href="/troubleshooting/common-issues">
+    Find solutions to frequent problems
+  </Card>
+  
+  <Card title="Best Practices" icon="Lightbulb" href="/troubleshooting/best-practices">
+    Learn deployment best practices
+  </Card>
+  
+  <Card title="Community" icon="Users" href="https://trailblazercommunity.salesforce.com">
+    Get help from the community
+  </Card>
+</Cards>

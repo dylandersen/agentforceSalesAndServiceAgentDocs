@@ -1,0 +1,538 @@
+---
+title: Apex Classes
+description: 'Business logic layer implementation and patterns'
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## Apex Business Logic Layer
+
+The Apex layer handles all complex business logic, AI integration, and data operations. This layer is designed for reusability, testability, and performance.
+
+## Class Categories
+
+<Cards>
+  <Card title="Agent Classes" icon="robot">
+    Handle record creation and orchestration
+  </Card>
+  <Card title="Intelligence Classes" icon="brain">
+    AI-powered analysis and insights
+  </Card>
+  <Card title="Helper Classes" icon="hand">
+    Utility functions and picklist data
+  </Card>
+  <Card title="Data Classes" icon="database">
+    Lightning Type data structures
+  </Card>
+</Cards>
+
+## Agent Classes
+
+### AccountCreationAgent
+
+Creates accounts through guided conversation with Lightning Types.
+
+```apex
+public with sharing class AccountCreationAgent {
+    @InvocableMethod(
+        label='Create Account with Agent'
+        description='Creates an account using Lightning Type input'
+    )
+    public static List<AccountCreationResult> createAccount(
+        List<AccountCreationInput> inputs
+    ) {
+        List<AccountCreationResult> results = new List<AccountCreationResult>();
+        
+        for (AccountCreationInput input : inputs) {
+            AccountCreationResult result = new AccountCreationResult();
+            
+            try {
+                Account acc = new Account(
+                    Name = input.name,
+                    Phone = input.phone,
+                    Website = input.website,
+                    Industry = input.industry,
+                    Type = input.accountType
+                    // ... more fields
+                );
+                
+                insert acc;
+                
+                result.success = true;
+                result.accountId = acc.Id;
+                result.accountName = acc.Name;
+                result.message = 'Account created successfully!';
+                
+            } catch (Exception e) {
+                result.success = false;
+                result.message = 'Error: ' + e.getMessage();
+            }
+            
+            results.add(result);
+        }
+        
+        return results;
+    }
+}
+```
+
+<Note>
+All agent classes use `@InvocableMethod` to be callable from Flows and GenAI Functions.
+</Note>
+
+### OpportunityCreationAgent
+
+Creates opportunities with account lookup and stage validation.
+
+**Key Features**:
+- Automatic account lookup by name
+- Dynamic stage picklist validation
+- Currency formatting
+- Rich output display
+
+### CaseCreationAgent
+
+Creates cases with contact lookup and priority validation.
+
+**Key Features**:
+- Contact lookup with account auto-population
+- Dynamic priority/status picklists
+- Comprehensive results display
+
+### ContactCreationAgent
+
+Creates contacts with required account association.
+
+**Key Features**:
+- Account association validation
+- Phone formatting
+- Extended field support (Title, Department)
+- Professional output rendering
+
+## Intelligence Classes
+
+### AccountIntelligence
+
+AI-powered 6-dimension account health analysis.
+
+```apex
+public with sharing class AccountIntelligence {
+    @InvocableMethod(
+        label='Analyze Account Intelligence'
+        description='Provides comprehensive account health analysis'
+    )
+    public static List<AccountHealthResult> analyzeAccount(
+        List<AccountInput> inputs
+    ) {
+        List<AccountHealthResult> results = new List<AccountHealthResult>();
+        
+        for (AccountInput input : inputs) {
+            // Query account data
+            Account acc = [
+                SELECT Id, Name, Industry, Type,
+                       (SELECT Id, Amount, StageName FROM Opportunities),
+                       (SELECT Id, Priority, Status FROM Cases),
+                       (SELECT Id, Subject FROM Tasks)
+                FROM Account
+                WHERE Id = :input.accountId
+                LIMIT 1
+            ];
+            
+            // Build AI prompt
+            String prompt = buildHealthAnalysisPrompt(acc);
+            
+            // Call Salesforce AI
+            String aiResponse = callSalesforceAI(prompt);
+            
+            // Parse and format results
+            AccountHealthResult result = parseAIResponse(aiResponse);
+            result.accountId = acc.Id;
+            result.accountName = acc.Name;
+            
+            results.add(result);
+        }
+        
+        return results;
+    }
+    
+    private static String callSalesforceAI(String promptText) {
+        try {
+            String modelName = 'sfdc_ai__DefaultOpenAIGPT4OmniMini';
+            
+            aiplatform.ModelsAPI.createGenerations_Request request =
+                new aiplatform.ModelsAPI.createGenerations_Request();
+            request.modelName = modelName;
+            
+            aiplatform.ModelsAPI_GenerationRequest requestBody =
+                new aiplatform.ModelsAPI_GenerationRequest();
+            request.body = requestBody;
+            requestBody.prompt = promptText;
+            
+            aiplatform.ModelsAPI modelsAPI = new aiplatform.ModelsAPI();
+            aiplatform.ModelsAPI.createGenerations_Response response =
+                modelsAPI.createGenerations(request);
+            
+            return response.Code200.generation.generatedText;
+            
+        } catch (Exception e) {
+            return 'Error: ' + e.getMessage();
+        }
+    }
+}
+```
+
+<Warning>
+The `aiplatform.ModelsAPI` requires Einstein Generative AI to be enabled in your org.
+</Warning>
+
+### OpportunityIntelligence
+
+Sales guidance with activity timeline and deal momentum assessment.
+
+**Analysis Dimensions**:
+- Activity timeline review
+- Deal momentum assessment
+- Risk identification
+- 3 actionable next steps
+
+### CasePriorityIntelligence
+
+AI-powered case priority scoring and recommendations.
+
+**Scoring Factors**:
+- Business impact (35%)
+- Customer tier (25%)
+- Severity (25%)
+- SLA risk (15%)
+
+## Helper Classes
+
+### AccountHelper
+
+Fetches dynamic Industry and Type picklist values from org configuration.
+
+```apex
+public with sharing class AccountHelper {
+    @AuraEnabled(cacheable=true)
+    public static List<PicklistValue> getIndustryValues() {
+        List<PicklistValue> values = new List<PicklistValue>();
+        
+        Schema.DescribeFieldResult fieldResult = 
+            Account.Industry.getDescribe();
+        
+        List<Schema.PicklistEntry> entries = 
+            fieldResult.getPicklistValues();
+        
+        for (Schema.PicklistEntry entry : entries) {
+            if (entry.isActive()) {
+                values.add(new PicklistValue(
+                    entry.getLabel(),
+                    entry.getValue()
+                ));
+            }
+        }
+        
+        return values;
+    }
+    
+    public class PicklistValue {
+        @AuraEnabled public String label;
+        @AuraEnabled public String value;
+        
+        public PicklistValue(String label, String value) {
+            this.label = label;
+            this.value = value;
+        }
+    }
+}
+```
+
+### OpportunityHelper
+
+Fetches dynamic Stage picklist values.
+
+### CaseHelper
+
+Fetches dynamic Priority and Status picklist values.
+
+## Similarity Helper Classes
+
+### OpportunitySimilarityHelper
+
+AI-powered opportunity similarity analysis using semantic matching.
+
+**Matching Criteria**:
+- Name similarity (25%)
+- Amount proximity (20%)
+- Stage matching (20%)
+- Account match (15%)
+- Type similarity (10%)
+- Next step alignment (5%)
+- Description similarity (5%)
+
+**Implementation**:
+
+```apex
+public with sharing class OpportunitySimilarityHelper {
+    @InvocableMethod(
+        label='Find Similar Opportunities'
+        description='Finds similar opportunities using AI analysis'
+    )
+    public static List<String> findSimilarOpportunities(
+        List<OpportunityInput> inputs
+    ) {
+        // Query current opportunity
+        Opportunity current = [
+            SELECT Name, Amount, StageName, Description, 
+                   Account.Name, Type, NextStep
+            FROM Opportunity
+            WHERE Id = :inputs[0].opportunityId
+        ];
+        
+        // Query potential matches (up to 200)
+        List<Opportunity> potentials = [
+            SELECT Id, Name, Amount, StageName, Description,
+                   Account.Name, Type, NextStep
+            FROM Opportunity
+            WHERE Id != :current.Id
+            ORDER BY LastModifiedDate DESC
+            LIMIT 200
+        ];
+        
+        // Build AI prompt for semantic matching
+        String prompt = buildSimilarityPrompt(current, potentials);
+        
+        // Call AI for analysis
+        String aiResponse = callSalesforceAI(prompt);
+        
+        return new List<String>{ aiResponse };
+    }
+}
+```
+
+### CaseSimilarityHelper
+
+Semantic case matching with weighted scoring.
+
+**Matching Criteria**:
+- Case type (40%)
+- Subject similarity (30%)
+- Description similarity (30%)
+
+## Data Classes (Lightning Types)
+
+All data classes follow this pattern:
+
+```apex
+@JsonAccess(serializable='always' deserializable='always')
+global class AccountCreationInput {
+    @AuraEnabled
+    global String name;
+
+    @AuraEnabled
+    global String phone;
+
+    @AuraEnabled
+    global String website;
+
+    @AuraEnabled
+    global String industry;
+
+    @AuraEnabled
+    global String accountType;
+
+    @AuraEnabled
+    global String billingStreet;
+
+    @AuraEnabled
+    global String billingCity;
+
+    @AuraEnabled
+    global String billingState;
+
+    @AuraEnabled
+    global String billingPostalCode;
+
+    @AuraEnabled
+    global String billingCountry;
+}
+```
+
+<Note>
+The `@JsonAccess` annotation is required for Lightning Type serialization/deserialization.
+</Note>
+
+## Common Patterns
+
+### Error Handling
+
+All Apex classes follow this error handling pattern:
+
+```apex
+try {
+    // Business logic here
+    
+} catch (DmlException e) {
+    // Handle DML errors
+    result.success = false;
+    result.message = 'Database error: ' + e.getDmlMessage(0);
+    
+} catch (Exception e) {
+    // Handle all other errors
+    result.success = false;
+    result.message = 'Unexpected error: ' + e.getMessage();
+    System.debug('Error details: ' + e.getStackTraceString());
+}
+```
+
+### Governor Limit Management
+
+```apex
+// Query efficiently
+List<Account> accounts = [
+    SELECT Id, Name, (SELECT Id FROM Opportunities LIMIT 10)
+    FROM Account
+    WHERE LastModifiedDate = LAST_N_DAYS:30
+    LIMIT 200
+];
+
+// Bulk DML operations
+List<Account> accountsToUpdate = new List<Account>();
+for (Account acc : accounts) {
+    acc.Status__c = 'Updated';
+    accountsToUpdate.add(acc);
+}
+update accountsToUpdate; // Single DML statement
+```
+
+### AI Integration Pattern
+
+```apex
+private static String callSalesforceAI(String promptText) {
+    try {
+        // Use default model
+        String modelName = 'sfdc_ai__DefaultOpenAIGPT4OmniMini';
+        
+        // Create request
+        aiplatform.ModelsAPI.createGenerations_Request request =
+            new aiplatform.ModelsAPI.createGenerations_Request();
+        request.modelName = modelName;
+        
+        // Set prompt
+        aiplatform.ModelsAPI_GenerationRequest requestBody =
+            new aiplatform.ModelsAPI_GenerationRequest();
+        request.body = requestBody;
+        requestBody.prompt = promptText;
+        
+        // Call API
+        aiplatform.ModelsAPI modelsAPI = new aiplatform.ModelsAPI();
+        aiplatform.ModelsAPI.createGenerations_Response response =
+            modelsAPI.createGenerations(request);
+        
+        return response.Code200.generation.generatedText;
+        
+    } catch (Exception e) {
+        System.debug('AI API Error: ' + e.getMessage());
+        return 'Error calling AI: ' + e.getMessage();
+    }
+}
+```
+
+## Testing Best Practices
+
+### Test Class Structure
+
+```apex
+@isTest
+private class AccountCreationAgentTest {
+    @testSetup
+    static void setupTestData() {
+        // Create test data
+        Account testAccount = new Account(
+            Name = 'Test Account',
+            Phone = '555-0100',
+            Website = 'https://test.com'
+        );
+        insert testAccount;
+    }
+    
+    @isTest
+    static void testSuccessfulCreation() {
+        // Arrange
+        AccountCreationInput input = new AccountCreationInput();
+        input.name = 'New Test Account';
+        input.phone = '555-0200';
+        input.website = 'https://newtest.com';
+        
+        // Act
+        Test.startTest();
+        List<AccountCreationResult> results = 
+            AccountCreationAgent.createAccount(
+                new List<AccountCreationInput>{ input }
+            );
+        Test.stopTest();
+        
+        // Assert
+        System.assertEquals(1, results.size());
+        System.assertEquals(true, results[0].success);
+        System.assertNotEquals(null, results[0].accountId);
+    }
+    
+    @isTest
+    static void testErrorHandling() {
+        // Test error scenarios
+    }
+}
+```
+
+### Code Coverage Tips
+
+**Test All Branches**
+- Ensure every if/else and try/catch is covered
+
+**Bulk Testing**
+- Test with multiple records (200+) to ensure bulk operations work
+
+**Negative Testing**
+- Test error conditions and exception handling
+
+**Governor Limits**
+- Test near governor limit boundaries
+
+## Next Steps
+
+<Cards>
+  <Card
+    title="Flows & Orchestration"
+    icon="diagram-next"
+    href="/docs/architecture/flows"
+  >
+    Learn how Flows call Apex classes
+  </Card>
+  
+  <Card
+    title="GenAI Functions"
+    icon="robot"
+    href="/docs/architecture/genai-functions"
+  >
+    Understand AI integration
+  </Card>
+  
+  <Card
+    title="API Reference"
+    icon="book"
+    href="/api-reference/apex-classes"
+  >
+    Complete Apex API documentation
+  </Card>
+  
+  <Card
+    title="Features"
+    icon="wand-magic-sparkles"
+    href="/docs/features/overview"
+  >
+    See Apex classes in action
+  </Card>
+</Cards>
+
