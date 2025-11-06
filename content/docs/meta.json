@@ -1,35 +1,11 @@
 {
   "pages": [
     "index",
-    {
-      "type": "separator",
-      "title": "Getting Started"
-    },
     "getting-started",
-    {
-      "type": "separator",
-      "title": "Core Concepts"
-    },
     "architecture",
-    {
-      "type": "separator",
-      "title": "Guides"
-    },
     "guides",
-    {
-      "type": "separator",
-      "title": "Configuration"
-    },
     "configuration",
-    {
-      "type": "separator",
-      "title": "Deployment"
-    },
     "deployment",
-    {
-      "type": "separator",
-      "title": "Reference"
-    },
     "api-reference"
   ]
 }
