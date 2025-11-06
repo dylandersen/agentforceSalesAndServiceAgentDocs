@@ -26,9 +26,5 @@ export function baseOptions(): BaseLayoutProps {
         active: 'nested-url',
       },
     ],
-    sidebar: {
-      banner: <NavSectionSelector />,
-      collapsible: true,
-    },
   };
 }
