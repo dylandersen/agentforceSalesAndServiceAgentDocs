@@ -1,0 +1,6 @@
+{
+  "title": "Deployment",
+  "icon": "Rocket",
+  "pages": ["index", "best-practices"]
+}
+
